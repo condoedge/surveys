@@ -3,4 +3,5 @@
 - Change poll section types (INcrement by 1: 0 => 1 and 1 => 2) and rename type_ps 
 - In polls, rename type to type_po
 - In answers see how to move objects to answerer and answerable
-
+- table conditions => renamed to condition_type
+- getConditionsBox method => add ask_question_once toggle

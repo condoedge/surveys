@@ -1,27 +1,9 @@
 <?php
 
-Route::layout('layouts.guest')->group(function(){
-
-
-
-	Route::middleware(['signed'])->group(function(){
-
-
-
-
-    });
-
-});
-
-Route::middleware(['signed', 'throttle:10,1'])->group(function(){
-
-
-
-});
-
-
 Route::layout('layouts.dashboard')->middleware(['auth'])->group(function(){
 
+    Route::get('surveys-list', Condoedge\Surveys\Kompo\SurveyEditor\SurveysList::class)->name('surveys.list');
+    Route::get('survey-edit/{id}', Condoedge\Surveys\Kompo\SurveyEditor\SurveyFormPage::class)->name('survey.edit');
 
 });
 

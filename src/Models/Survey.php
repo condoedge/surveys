@@ -27,10 +27,21 @@ class Survey extends Model
 	/* ABSTRACT */
 
 	/* RELATIONS */
+	public function pollSections()
+	{
+		return $this->hasMany(PollSection::class)->orderByRaw('-`order` DESC');
+	}
 
     /* SCOPES */
 
 	/* ACTIONS */
+	public function createNextPollSection()
+	{
+		$lastPollSection = new PollSection();
+		$this->pollSections()->save($lastPollSection);
+
+		return $lastPollSection;
+	}
 
 	/* ELEMENTS */
 }

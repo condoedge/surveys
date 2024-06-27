@@ -1,5 +1,6 @@
 <?php 
 
 return [
-    'survey-model-namespace' => App\Models\Survey::class,
+    'survey-model-namespace' => App\Models\Surveys\Survey::class,
+    'poll-model-namespace' => App\Models\Surveys\Poll::class,
 ];
