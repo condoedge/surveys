@@ -1,0 +1,25 @@
+{
+    "name": "condoedge/surveys",
+    "description": "Survey and forms module for your kompo application",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Condoedge\\Surveys\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^7.3|^8.0",
+        "laravel/framework": ">=5.6.0",
+        "kompo/auth": ">=0.4"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Condoedge\\Surveys\\CondoedgeSurveysServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
