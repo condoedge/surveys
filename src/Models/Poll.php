@@ -2,6 +2,10 @@
 
 namespace Condoedge\Surveys\Models;
 
+use App\Models\Surveys\Choice;
+use App\Models\Surveys\Condition;
+use App\Models\Surveys\PollSection;
+use App\Models\Surveys\AnswerPoll;
 use Kompo\Auth\Models\Model;
 
 class Poll extends Model
@@ -13,174 +17,150 @@ class Poll extends Model
     protected $translatable = [
         'body',
     ];
-
-    public const PO_TYPE_TEXT = 1;
-    public const PO_TYPE_SELECT = 2;
-    public const PO_TYPE_RADIO = 3;
-    public const PO_TYPE_MULTICHECKBOX = 4;
-    public const PO_TYPE_DATE = 5;
-    public const PO_TYPE_BINARY = 6;
-    public const PO_TYPE_INPUT = 7;
-    public const PO_TYPE_ACCEPTATION = 8;
-    public const PO_TYPE_RATING = 9;
+    protected $casts = [
+        'type_po' => PollTypeEnum::class,
+    ];
 
     public const CHOICES_TEXT = 1;
     public const CHOICES_AMOUNT = 2;
     public const CHOICES_QUANTITY = 3;
 
-    public const TEXT_SHORT = 1;
-    public const TEXT_LONG = 2;
-    public const TEXT_PHONE = 3;
-    public const TEXT_EMAIL = 4;
-    public const TEXT_ADDRESS = 5;
+    public const DISPLAY_MODE_EDITING = 1;
+    public const DISPLAY_MODE_INITIAL = 2;
+    public const DISPLAY_MODE_CONDITION_PASSED = 3;
 
 	/* RELATIONS */
-    public function conditions()
+    public function pollSection()
     {
-        return $this->hasMany(Condition::class);
+        return $this->belongsTo(PollSection::class);
+    }
+
+    public function condition()
+    {
+        return $this->hasOne(Condition::class);
+    }
+
+    public function choices()
+    {
+        return $this->hasMany(Choice::class);
     }
 
 	/* SCOPES */
 
 	/* CALCULATED FIELDS */
-    public static function pickableTypes()
+    public function showChoicesAmounts()
     {
-        return collect([
-            static::PO_TYPE_TEXT => static::pollTypeLabel('campaign.text', 'textalign-left', 'campaign.text-sub1'),
-            static::PO_TYPE_INPUT => static::pollTypeLabel('campaign.text-input', 'row-vertical', 'campaign.text-input-sub1'),
-            static::PO_TYPE_SELECT => static::pollTypeLabel('campaign.selection', 'textalign-justifycenter', 'campaign.selection-sub1'),
-            static::PO_TYPE_RADIO => static::pollTypeLabel('campaign.simple-choice', 'record-circle', 'campaign.simple-choice-sub1'),
-            static::PO_TYPE_MULTICHECKBOX => static::pollTypeLabel('campaign.multiple-choice', 'tick-square', 'campaign.multiple-choice-sub1'),
-            static::PO_TYPE_DATE => static::pollTypeLabel('campaign.date', 'calendar', 'campaign.date-sub1'),
-            static::PO_TYPE_BINARY => static::pollTypeLabel('campaign.binary-or-yes-no', 'like-dislike', 'campaign.binary-or-yes-no-sub1'),
-            static::PO_TYPE_RATING => static::pollTypeLabel('campaign.rating', 'star-1', 'campaign.rating-sub1'),
-            static::PO_TYPE_ACCEPTATION => static::pollTypeLabel('campaign.acceptation', 'tick-square', 'campaign.acceptation-sub1'),
-        ]);
+        return $this->choices()->whereNotNull('choice_amount')->count();
+    }
+
+    public function showChoicesQuantities()
+    {
+        return $this->choices()->whereNotNull('choice_max_quantity')->count();
+    }
+
+    public function hasChoices()
+    {
+        return $this->choices()->count();
+    }
+
+    public function getTheCondition()
+    {
+        return $this->condition()->first();
+    }
+
+    public function hasConditions()
+    {
+        return $this->getTheCondition();
+    }
+
+    public function getDependentConditions()
+    {
+        return Condition::where('condition_poll_id', $this->id)->get();
+    }
+
+    public function getPreviousPollsWithChoices()
+    {
+        return $this->survey->pollSections()
+            ->where('order', '<=', $this->pollSection->order)->with('polls')->get()
+            ->flatMap->polls
+            ->filter(fn($poll) => $poll->hasChoices())
+            ->reject(fn($poll) => $poll->id == $this->id)
+            ->reject(fn($poll) => ($poll->poll_section_id == $this->poll_section_id) && ($poll->position == 1));
+    }
+
+    public function shouldDisplayPoll($displayMode, $answer = null)
+    {
+        if ($displayMode != Poll::DISPLAY_MODE_INITIAL) {
+            return true;
+        }
+
+        if ($answer && ($condition = $this->getTheCondition())) {
+            $ap = AnswerPoll::onlyGetAnswerPoll($answer->id, $condition->condition_poll_id);
+            if ($condition->condition_choice_id == $ap->answer_text) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function deletable()
+    {
+        return $this->pollSection->deletable();
     }
 
 	/* ACTIONS */
     public function delete()
     {
 
-
         parent::delete();
     }
 
-	/* ELEMENTS */
-    public static function pollTypeLabel($text, $icon, $description)
+    public function setDefaultOptions()
     {
-        return _Flex4(
-            _Sax($icon, 30)->class('text-gray-500'),
-            _Rows(
-                _Html($text)->class('text-lg font-medium text-level2'),
-                _Html($description)->class('text-xs text-gray-500'),
-            )
-        )->class('px-4 py-2');
+        return $this->type_po->pollTypeClass()->setDefaultOptionsForPollType($this);        
+    }
+
+    public function preloadDefaultChoice($content)
+    {
+        $choice = new Choice();
+        $choice->choice_content = $content;
+        $this->setRelation('choices', $this->choices->push($choice));      
+    }
+
+    public function getOrNewTheCondition()
+    {
+        $condition = $this->getTheCondition();
+
+        if (!$condition) {
+            $condition = new Condition();
+            $condition->poll_id = $this->id;
+        }
+
+        return $condition;
+    }
+
+	/* ELEMENTS */
+    public function getDisplayPostConditionEls($answer = null)
+    {
+        return $this->type_po->pollTypeClass()->getDisplayInputs($this, Poll::DISPLAY_MODE_CONDITION_PASSED, $answer);
+    }
+
+    public function getDisplayInputEls($answer = null)
+    {
+        return $this->type_po->pollTypeClass()->getDisplayInputs($this, Poll::DISPLAY_MODE_INITIAL, $answer);
+    }
+
+    public function getPreviewInputEls()
+    {
+        return $this->type_po->pollTypeClass()->getDisplayInputs($this, Poll::DISPLAY_MODE_EDITING);
     }
 
     public function getEditInputs()
     {
-        switch ($this->type_po) {
-            case Poll::PO_TYPE_INPUT:
-                return _Rows(
-                    $this->getConditionsBox(),
-                    _Input('campaign.question')->name('body'),
-                    _Input('campaign.question-sub1')->name('explanation'),
-                    _ButtonGroup('campaign.input-type')->name('text_type')->required()->vertical()->options(collect([
-                        Poll::TEXT_SHORT => __('campaign.field-short'),
-                        Poll::TEXT_LONG => __('campaign.field-long'),
-                        Poll::TEXT_PHONE => __('campaign.field-phone'),
-                        Poll::TEXT_EMAIL => __('auth.email'),
-                        Poll::TEXT_ADDRESS => __('campaign.address'),
-                    ])->mapWithKeys(fn($label, $key) => [
-                        $key => _Html($label)->class('p-2')
-                    ]))->comment('campaign.this-will-validate-users-input')
-                );
-            case Poll::PO_TYPE_TEXT:
-                return _Rows(
-                    $this->getConditionsBox(),
-                    _CKEditor()->name('body')->class('whiteField -mt-16'),
-                );
-            case Poll::PO_TYPE_DATE:
-                return _Rows(
-                    $this->getConditionsBox(),
-                    _Input('campaign.question')->name('body'),
-                    _Input('campaign.question-sub1')->name('explanation'),
-                );
-            case Poll::PO_TYPE_ACCEPTATION:
-                return _Rows(
-                    $this->getConditionsBox(),
-                    _Input('campaign.question')->name('body'),
-                    _Input('campaign.question-sub1')->name('explanation'),
-                );
-            case Poll::PO_TYPE_RATING:
-                $strictOptions = $this->model->getStrictOptions();
-
-                if (!$this->model->choices->count()) {
-                    $this->model->preloadChoices($strictOptions);
-                }
-
-                return _Rows(
-                    $this->getConditionsBox(),
-                    _Input('campaign.question')->name('body'),
-                    _Input('campaign.question-sub1')->name('explanation'),
-
-                    _MultiForm()->name('choices')->class('hidden')
-                        ->formClass(ChoiceForm::class, [
-                            'type' => $this->model->type,
-                        ]),
-
-                    _Toggle()->name('choices_type_temp', false)->value(0)->class('hidden'),
-                    _Toggle()->name('quantity_type_temp', false)->value(0)->class('hidden'),
-                );
-
-            default: 
-                $optionsClass = $this->model->hasAmountInChoices() ? ' show_amount ' : '';
-                $optionsClass .= $this->model->hasQuantityInChoices() ? ' show_quantity ' : '';
-
-                $multiForm = _MultiForm()->name('choices')
-                    ->addLabel("campaign.add-a-new-item")
-                    ->formClass(ChoiceForm::class, [
-                        'type' => $this->model->type,
-                        'withAmounts' => request('choices_type_temp'),
-                        'withQuantities' => request('quantity_type_temp')
-                    ])
-                    ->asTable(array_merge
-                        (
-                            [_Th('campaign.add-options'),],
-                            [_Th('campaign.amount')->class('amount_input')],
-                            [_Th('campaign.max-quantity')->class('quantity_input')],
-                            [_Th(''),]
-                        )
-                    )->class($optionsClass)->id('mf');
-
-                if($this->model->type == Poll::TYPE_BINARY) {
-                    if (!$this->model->choices->count()) {
-                        $this->model->preloadChoices([
-                            'campaign.yes',
-                            'campaign.no'
-                        ]);
-                    }
-                    $multiForm->noAdding();
-                } else {
-                    $multiForm->preloadIfEmpty();
-                }
-
-
-                return _Rows(
-                    $this->getConditionsBox(),
-                    _Input('campaign.question')->name('body'),
-                    _Input('campaign.question-sub1')->name('explanation'),
-                    _Toggle('campaign.toggle-to-associate-amounts-to-choices')
-                        ->name('choices_type_temp', false)->value($this->model->hasAmountInChoices())
-                        ->run('() => { toggleAmountInputs() }'),
-                    _Toggle('campaign.toggle-to-associate-a-maximum-quantity-to-your-choices')
-                        ->name('quantity_type_temp', false)->value($this->model->hasQuantityInChoices())
-                        ->run('() => { toggleQuantityInputs() }'),
-                    $multiForm
-                );
-        }
+        return $this->type_po->pollTypeClass()->getEditInputs($this);
     }
-
 
 }

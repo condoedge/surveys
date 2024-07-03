@@ -18,8 +18,31 @@ class PollSection extends Model
     }
 
 	/* SCOPES */
+    public function scopeOrderPs($query)
+    {
+        $query->orderByRaw('-`order` DESC');
+    }
 
 	/* CALCULATED FIELDS */
+    public function getFirstPoll()
+    {
+        return $this->polls()->where('position', '<>', 1)->first();
+    }
+
+    public function getLastPoll()
+    {
+        return $this->polls()->where('position', 1)->first();
+    }
+
+    public function isDoubleColumn()
+    {
+        return $this->type_ps == PollSection::PS_DOUBLE_TYPE;
+    }
+
+    public function deletable()
+    {
+        return $this->survey->team_id == currentTeamId();
+    }
 
 	/* ACTIONS */
     public function delete()

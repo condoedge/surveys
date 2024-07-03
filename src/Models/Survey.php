@@ -3,6 +3,7 @@
 namespace Condoedge\Surveys\Models;
 
 use Kompo\Auth\Models\Model;
+use App\Models\Surveys\PollSection;
 
 class Survey extends Model
 {
@@ -24,20 +25,31 @@ class Survey extends Model
         parent::save();
     }
 
-	/* ABSTRACT */
-
 	/* RELATIONS */
 	public function pollSections()
 	{
-		return $this->hasMany(PollSection::class)->orderByRaw('-`order` DESC');
+		return $this->hasMany(PollSection::class)->orderPs();
+	}
+
+	public function polls()
+	{
+		return $this->hasMany(Poll::class);
 	}
 
     /* SCOPES */
 
+	/* CALCULATED FIELDS */
+	public function hasChoicesWithAmounts()
+	{
+		return Choice::forPoll($this->polls()->pluck('id'))->whereNotNull('choice_amount')->count();
+	}
+
 	/* ACTIONS */
-	public function createNextPollSection()
+	public function createNextPollSection($type = null)
 	{
 		$lastPollSection = new PollSection();
+		$lastPollSection->order = ($this->pollSections()->max('order') ?: 0) + 1;
+		$lastPollSection->type_ps = $type ?: PollSection::PS_SINGLE_TYPE;
 		$this->pollSections()->save($lastPollSection);
 
 		return $lastPollSection;

@@ -2,12 +2,14 @@
 
 namespace Condoedge\Surveys\Models;
 
+use App\Models\Surveys\Poll;
+
 trait BelongsToPollTrait
 {
     /* RELATIONS */
     public function poll()
     {
-        return $this->belongsTo(config('condoedge-surveys.poll-model-namespace'));
+        return $this->belongsTo(Poll::class);
     }
 
     /* CALCULATED FIELDS */

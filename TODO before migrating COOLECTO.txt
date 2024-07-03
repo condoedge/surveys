@@ -5,3 +5,7 @@
 - In answers see how to move objects to answerer and answerable
 - table conditions => renamed to condition_type
 - getConditionsBox method => add ask_question_once toggle
+- bring back the ask_question_once toggle and show_before_transaction
+- rename choices table 3 columns appending choice_***
+- changed answers => answerable & answerer
+- changed answer_choices => answer_polls + answer_text

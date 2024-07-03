@@ -16,11 +16,8 @@ return new class extends Migration
             addMetaData($table);
 
             $table->foreignId('survey_id')->constrained();
-            $table->foreignId('poll_id')->constrained();
             $table->nullableMorphs('answerer');
             $table->nullableMorphs('answerable');
-
-            $table->text('content')->nullable();
 
             $table->tinyInteger('answer_locked')->nullable();
             

@@ -17,4 +17,11 @@ class Choice extends Model
 	/* ACTIONS */
 
 	/* ELEMENTS */
+	public function choiceLabelInHtml()
+	{
+		return '<div>'.
+			'<div>'.$this->choice_content.'</div>'.
+			'<div class="text-sm text-info">'.$this->choice_amount.'</div>'.
+		'</div>';
+	}
 }

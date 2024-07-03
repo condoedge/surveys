@@ -88,7 +88,8 @@ class CondoedgeSurveysServiceProvider extends ServiceProvider
     protected function loadRelationsMorphMap()
     {
         Relation::morphMap([
-            'survey' => config('condoedge-surveys.survey-model-namespace'),
+            'survey' => \App\Models\Surveys\Answer::class,
+            'poll' => \App\Models\Surveys\Poll::class,
         ]);
     }
 }

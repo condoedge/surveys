@@ -3,6 +3,8 @@
 namespace Condoedge\Surveys\Kompo\SurveyEditor;
 
 use App\Models\Surveys\Poll;
+use App\Models\Surveys\Choice;
+use App\Models\Surveys\Condition;
 use Kompo\Auth\Common\ModalScroll;
 
 class EditPollForm extends ModalScroll
@@ -13,24 +15,46 @@ class EditPollForm extends ModalScroll
 
     public function created()
     {
+        $this->model->poll_section_id = $this->model->poll_section_id ?: $this->prop('poll_section_id');
         $this->model->survey_id = $this->model->survey_id ?: $this->prop('survey_id');
+
+        if (!$this->model->survey) {
+            $this->model->survey_id = $this->model->pollSection->survey_id;
+        }
+
         $this->model->type_po = $this->model->type_po ?: $this->prop('type_po');
+        $this->model->position = $this->model->position ?: $this->prop('position');
+
+        $this->model->setDefaultOptions();
     }
 
     public function beforeSave()
     {
-        $this->model->poll_section_id = $this->model->survey->createNextPollSection()->id;
-
+        $this->model->poll_section_id = $this->model->poll_section_id ?: $this->model->survey->createNextPollSection()->id;
+        $this->model->position = $this->model->position ?: 0;
     }
 
-    public function afterSave() 
+    public function afterSave()
     {
+        if(request('has_conditions')) {
+            $cond = $this->model->getOrNewTheCondition();
+            $cond->condition_poll_id = request('condition_poll_id');
+            $cond->condition_choice_id = request('condition_choice_id');
+            $cond->condition_type = request('condition_type');
+            $cond->save();
+        } else {
+            $this->model->getTheCondition()?->delete();
+        }
+    }
 
+    public function response() 
+    {
+        return redirect()->route('survey.edit', ['id' => $this->model->survey_id]);
     }
 
     public function headerButtons()
     {
-        return _SubmitButton('campaign.save')->closeModal()->refresh('survey-form-page');
+        return _SubmitButton('campaign.save');
     }
 
     public function body()
@@ -40,28 +64,29 @@ class EditPollForm extends ModalScroll
         );
     }
 
-    protected function getPosition() {
-        if($this->section === null) {
-            $this->getPresetPosition();
-
-            $poll_sections = PollSection::where('survey_id', $this->surveyId)->orderBy('order')->get();
-
-            if($this->section === null) {
-                $poll_section_id = PollSection::create(['survey_id' => $this->surveyId, 'order' => $poll_sections->max('order') + 1])->id;
-            }
-
-            $this->section = $poll_section_id;
-            $this->position = 0;
-        }
+    public function deleteChoice($id)
+    {
+        Choice::findOrFail($id)->delete();
     }
 
-    public function getChoices($value) {
-        $poll = Poll::with('choices')->where('id', $value)->first();
-        if($this->condition_poll_id != null && $value == null) {
-            return Poll::with('choices')->where('id', $this->condition_poll_id)->first()->choices->pluck('content', 'id');
-        } else {
-            return $poll != null ? $poll->choices->pluck('content', 'id') : collect([]);
+    public function searchConditionPollChoices($conditionPollId) 
+    {
+        $poll = Poll::find($conditionPollId);
+
+        if (!$poll) {
+            return [];
         }
+
+        return $poll->choices()->pluck('choice_content', 'id');
+    }
+
+    public function retrieveConditionPollChoice($conditionChoiceId) 
+    {
+        $choice = Choice::find($conditionChoiceId);
+
+        return [
+            $choice->id => $choice->choice_content,
+        ];
     }
 
     public function rules()
@@ -73,10 +98,5 @@ class EditPollForm extends ModalScroll
             'condition_type' => 'required_unless:has_conditions,0|nullable',
             'condition_choice_id' => 'required_unless:has_conditions,0|nullable'
     	];
-    }
-
-    public function deleteChoice($id)
-    {
-        Choice::findOrFail($id)->delete();
     }
 }

@@ -7,7 +7,9 @@ use Kompo\Query;
 
 class SurveyPollSectionsList extends Query
 {
-	public $orderable = 'order';
+	public $id = 'polls-list';
+
+    public $orderable = 'order';
     public $dragHandle = '.cursor-move';
 
     public $noItemsFound = '';
@@ -22,34 +24,67 @@ class SurveyPollSectionsList extends Query
 
 	public function query()
 	{
-		return PollSection::where('survey_id', $this->surveyId)->orderBy('order');
+		return PollSection::where('survey_id', $this->surveyId)->orderPs();
 	}
-
-    public function getSpaceContent($pollSection, $position) 
-    {
-        return _Html('SEEC');
-    }
 
     public function render($pollSection)
     {
-        if($pollSection->type == PollSection::PS_DOUBLE_TYPE) {
+        $content = $this->getPollEditEls($pollSection);
+
+        if($pollSection->isDoubleColumn()) {
             $content = _Columns(
-                _Div($this->getSpaceContent($pollSection, 0))->class('md:pr-2'),
-                _Div($this->getSpaceContent($pollSection, 1))->class('md:pl-2'),
-            )->noGutters()->class('mb-2 w-full mx-auto');
-        } else {
-            $content = $this->getSpaceContent($pollSection, 0)->class('mb-2');
+                $content,
+                $this->getPollEditEls($pollSection, 1),
+            );
         }
 
         return _Flex(
             _Html()->icon(_Svg('selector')->class('w-8 h-8 text-gray-400'))->class('cursor-move'),
-            $content->class('flex-1'),
-            _DeleteLink()->byKey($pollSection)->class('pl-2 mb-4'),
+            $content->class('flex-1 mb-2'),
+            _Delete($pollSection)->class('pl-2 mb-4'),
         );
+    }
+
+    protected function getPollEditEls($pollSection, $position = 0)
+    {
+        $poll = $position == 0 ? $pollSection->getFirstPoll() : $pollSection->getLastPoll();
+
+        if (!$poll) {
+            return _CardWhiteP4(
+                _Html('campaign.empty-section')->class('uppercase'),
+                _Html('campaign.add-a-type-of-question'),
+            )->selfPost('getAddPollForm', [
+                'id' => $pollSection->id,
+                'position' => $position,
+            ])->inPanel('pick-poll-type-panel');
+        }
+
+        return  _CardWhiteP4(
+            _FlexBetween(
+                $poll->getPreviewInputEls(),
+                _FlexEnd2(
+                    _Link()->icon(_Sax('edit',20)->class('text-gray-600'))
+                        ->selfUpdate('getPollForm', [
+                            'id' => $poll->id,
+                        ])->inModal(),
+                    _Delete($poll)->refresh(),
+                ),
+            ),
+            !$poll->hasConditions() ? null : 
+                _Pill('campaign.display-condition')->class('absolute right-4 top-2 bg-warning'),
+        )->class('relative');
     }
 
     public function getPollForm($id)
     {
-    	return new PollEditModifyForm($id);
+        return new EditPollForm($id);
+    }
+
+    public function getAddPollForm()
+    {
+        return new AddPollForm($this->surveyId, [
+            'poll_section_id' => request('id'),
+            'position' => request('position'),
+        ]);
     }
 }

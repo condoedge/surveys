@@ -2,12 +2,14 @@
 
 namespace Condoedge\Surveys\Models;
 
+use App\Models\Surveys\Survey;
+
 trait BelongsToSurveyTrait
 {
     /* RELATIONS */
     public function survey()
     {
-        return $this->belongsTo(config('condoedge-surveys.survey-model-namespace'));
+        return $this->belongsTo(Survey::class);
     }
 
     /* CALCULATED FIELDS */
@@ -19,7 +21,7 @@ trait BelongsToSurveyTrait
     /* ACTIONS */
 
     /* SCOPES */
-    public function scopeForEvent($query, $idOrIds)
+    public function scopeForSurvey($query, $idOrIds)
     {
         scopeWhereBelongsTo($query, 'survey_id', $idOrIds);
     }

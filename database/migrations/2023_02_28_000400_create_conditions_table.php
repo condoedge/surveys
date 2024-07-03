@@ -12,14 +12,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('choices', function (Blueprint $table) {
+        Schema::create('conditions', function (Blueprint $table) {
             
             addMetaData($table);
 
             $table->foreignId('poll_id')->constrained();
             $table->tinyInteger('condition_type')->default(Condition::TYPE_IS_EQUAL_TO);
-            $table->foreignId('condition_poll_id')->constrained();
-            $table->foreignId('condition_choice_id')->nullable()->constrained();
+            $table->foreignId('condition_poll_id')->constrained('polls');
+            $table->foreignId('condition_choice_id')->nullable()->constrained('choices');
             
         });
     }
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('choices');
+        Schema::dropIfExists('conditions');
     }
 };

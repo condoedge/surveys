@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('choices', function (Blueprint $table) {
+        Schema::create('answer_polls', function (Blueprint $table) {
             
             addMetaData($table);
 
+            $table->foreignId('answer_id')->constrained();
             $table->foreignId('poll_id')->constrained();
-
-            $table->string('choice_content')->nullable();
-            $table->decimal('choice_max_quantity', 10, 2)->nullable();
-            $table->decimal('choice_amount', 10, 2)->nullable();
+            $table->text('answer_text')->nullable();
             
         });
     }
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('choices');
+        Schema::dropIfExists('answer_polls');
     }
 };
