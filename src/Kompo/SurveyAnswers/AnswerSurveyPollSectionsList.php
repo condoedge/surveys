@@ -42,16 +42,14 @@ class AnswerSurveyPollSectionsList extends Query
             );
         }
 
-        return _Flex(
+        return _Rows(
             $content
         );
     }
 
     public function saveAnswerForPoll()
     {
-        $ap = AnswerPoll::createOrGetAnswerPoll($this->answerId, request('poll_id'));
-        $ap->answer_text = request('poll_answer');
-        $ap->save();
+        $this->answer->saveAnswerToSinglePoll(request('poll_id'), request('poll_answer'));
 
         return $this->answer->getTotalAnswerCostEls();
     }

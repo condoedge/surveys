@@ -14,7 +14,7 @@ class PollSection extends Model
 	/* RELATIONS */
     public function polls()
     {
-        return $this->hasMany(Poll::class)->orderByRaw('-`position` DESC');
+        return $this->hasMany(Poll::class)->orderPo();
     }
 
 	/* SCOPES */

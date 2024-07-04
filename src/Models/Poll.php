@@ -46,6 +46,10 @@ class Poll extends Model
     }
 
 	/* SCOPES */
+    public function scopeOrderPo($query)
+    {
+        $query->orderByRaw('-`position_po` DESC');
+    }
 
 	/* CALCULATED FIELDS */
     public function showChoicesAmounts()
@@ -81,7 +85,10 @@ class Poll extends Model
     public function getPreviousPollsWithChoices()
     {
         return $this->survey->pollSections()
-            ->where('order', '<=', $this->pollSection->order)->with('polls')->get()
+            ->when($this->poll_section_id,  //If null, we are appending a new pollSection
+                fn($q) => $q->where('order', '<=', $this->pollSection->order)
+            )
+            ->with('polls')->get()
             ->flatMap->polls
             ->filter(fn($poll) => $poll->hasChoices())
             ->reject(fn($poll) => $poll->id == $this->id)
@@ -148,9 +155,9 @@ class Poll extends Model
         return $this->type_po->pollTypeClass()->getDisplayInputs($this, Poll::DISPLAY_MODE_CONDITION_PASSED, $answer);
     }
 
-    public function getDisplayInputEls($answer = null)
+    public function getDisplayInputEls($answer = null, $multiPage = false)
     {
-        return $this->type_po->pollTypeClass()->getDisplayInputs($this, Poll::DISPLAY_MODE_INITIAL, $answer);
+        return $this->type_po->pollTypeClass()->getDisplayInputs($this, Poll::DISPLAY_MODE_INITIAL, $answer, $multiPage);
     }
 
     public function getPreviewInputEls()

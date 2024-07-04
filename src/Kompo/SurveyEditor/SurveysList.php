@@ -52,4 +52,15 @@ class SurveysList extends Table
             'answerer_type' => 'user',
         ]);
     }
+
+    public function getMultiPage($id)
+    {
+        return new \Condoedge\Surveys\Kompo\SurveyAnswers\AnswerSurveyMultiPage(null, [
+            'survey_id' => $id,
+            'answerable_id' => auth()->id(),
+            'answerable_type' => 'user',
+            'answerer_id' => auth()->id(),
+            'answerer_type' => 'user',
+        ]);
+    }
 }

@@ -4,6 +4,7 @@ namespace Condoedge\Surveys\Models;
 
 use Kompo\Auth\Models\Model;
 use App\Models\Surveys\Poll;
+use App\Models\Surveys\AnswerPoll;
 
 class Answer extends Model
 {
@@ -45,6 +46,13 @@ class Answer extends Model
 	    }
 
 	    return $answer;
+    }
+
+    public function saveAnswerToSinglePoll($pollId, $pollAnswer)
+    {
+        $ap = AnswerPoll::createOrGetAnswerPoll($this->id, $pollId);
+        $ap->answer_text = $pollAnswer;
+        $ap->save();
     }
 
     public function delete()

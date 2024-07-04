@@ -7,12 +7,6 @@ use Kompo\Form;
 
 class AnswerSurveyOnePage extends Form
 {
-    protected $answerableId;
-    protected $answerableType;
-
-    protected $answererId;
-    protected $answererType;
-
     protected $survey;
     protected $answerable;
 
@@ -31,31 +25,18 @@ class AnswerSurveyOnePage extends Form
     public function render() 
     {
         return _Rows(
-            !$this->model->answerable?->id ? 
-                _Html() : 
-                _Html($this->model->answerable->full_name),
+            $this->answerableEls(),
             _Div(
                 new AnswerSurveyPollSectionsList([
                     'answer_id' => $this->model->id,
                 ]),
             ),
             $this->model->getTotalAnswerCostPanel(),
-            _Columns(
-                $this->getBackButton(),
-                $this->getNextButton(),
-            ),
         )->class('p-6');
     }
 
-    protected function getBackButton()
+    protected function answerableEls()
     {
-        return;
-        return !$this->prevRecipientId ? ($this->model->prevOrder ? $this->backToPrevExperienceButton() : _Html()) : $this->backButton();
-    }
-
-    protected function getNextButton()
-    {
-        return;
-        return $this->isPartOfExperience ? $this->paymentButton() : $this->nextButton();
+        return !$this->model->answerable?->id ? _Html() : _Html($this->model->answerable->full_name);
     }
 }

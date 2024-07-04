@@ -1,11 +1,13 @@
-
 - Add team_id to surveys table and make campaign morphable
 - Change poll section types (INcrement by 1: 0 => 1 and 1 => 2) and rename type_ps 
 - In polls, rename type to type_po
-- In answers see how to move objects to answerer and answerable
 - table conditions => renamed to condition_type
+
+- In answers see how to move objects to answerer and answerable
+- changed answers => answerable & answerer
+
+- rename choices table 3 columns appending choice_***
+- changed answer_choices => answer_polls + answer_text
+
 - getConditionsBox method => add ask_question_once toggle
 - bring back the ask_question_once toggle and show_before_transaction
-- rename choices table 3 columns appending choice_***
-- changed answers => answerable & answerer
-- changed answer_choices => answer_polls + answer_text

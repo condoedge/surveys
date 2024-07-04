@@ -18,31 +18,34 @@ abstract class BasePollType
     }
 
 	/* DISPLAY ELEMENTS */
-	public function getDisplayInputs($poll, $displayMode, $answer = null)
+	public function getDisplayInputs($poll, $displayMode, $answer = null, $multiPage = false)
     {
         $inputEl = $this->mainInputEl($poll)->class('mb-0');
 
         if (static::POLL_IS_A_FIELD && ($displayMode != Poll::DISPLAY_MODE_EDITING)) {
-            $inputEl = $inputEl->name('poll_answer', false)
-                ->selfPost('saveAnswerForPoll', [
-                    'poll_id' => $poll->id,
-                ])->inPanel(Answer::SURVEY_COST_PANEL);
+            $inputEl = $inputEl->name('poll_answer', false);
 
             if ($answer) {//Set value
                 $ap = AnswerPoll::onlyGetAnswerPoll($answer->id, $poll->id);
                 $inputEl = $inputEl->value($ap?->answer_text);
             }
 
-            foreach ($poll->getDependentConditions() as $condition) {
-                $inputEl = $inputEl->onChange(
-                    fn($e) => $e->selfPost('manageDisplayForCondition', [
-                        'condition_id' => $condition->id,
-                    ])->inPanel('poll-wrapper-'.$condition->poll_id)
-                );
-            }
+            if (!$multiPage) {
+                $inputEl = $inputEl->selfPost('saveAnswerForPoll', [
+                    'poll_id' => $poll->id,
+                ])->inPanel(Answer::SURVEY_COST_PANEL);
 
-            //Last optional Action
-            $inputEl = $inputEl->alert('Answer saved!');
+                foreach ($poll->getDependentConditions() as $condition) {
+                    $inputEl = $inputEl->onChange(
+                        fn($e) => $e->selfPost('manageDisplayForCondition', [
+                            'condition_id' => $condition->id,
+                        ])->inPanel('poll-wrapper-'.$condition->poll_id)
+                    );
+                }
+
+                //Last optional Action
+                $inputEl = $inputEl->alert('Answer saved!');
+            }
         }
 
         return _Panel(
@@ -62,12 +65,12 @@ abstract class BasePollType
     {
         return _Rows(
             _FlexBetween(
-                _Html($poll->body)->class('font-semibold'),
-                !$poll->explanation ? null :
+                _Html($poll->body_po)->class('font-semibold'),
+                !$poll->explanation_po ? null :
                     _Link()->icon('question-mark-circle')->toggleId('explanation-div-'.$poll->id)
             )->class('mb-1'),
-            !$poll->explanation ? null : 
-                _Html($poll->explanation)->class('text-sm text-gray-400 mb-2')->id('explanation-div-' . $poll->id),
+            !$poll->explanation_po ? null : 
+                _Html($poll->explanation_po)->class('text-sm text-gray-400 mb-2')->id('explanation-div-' . $poll->id),
         );
     }
 
@@ -85,15 +88,15 @@ abstract class BasePollType
     protected function getQuestionInfoEls($poll)
     {
     	return _Rows(
-            _Input('campaign.question')->name('body'),
-            _Input('campaign.question-sub1')->name('explanation'),
+            _Input('campaign.question')->name('body_po'),
+            _Input('campaign.question-sub1')->name('explanation_po'),
         );
     }
 
     protected function getQuestionOptionsEls($poll)
     {
         return _Rows(
-            _Toggle('campaign.answer-required')->name('required')->default(1),
+            _Toggle('campaign.answer-required')->name('required_po')->default(1),
             /* TODO uncomment later 
                 currentCampaign()->isMembership() ? null : _Toggle('campaign.ask-question-once')
                 ->name('ask_question_once')->value($this->ask_question_once),
@@ -117,7 +120,7 @@ abstract class BasePollType
                 _Columns(
                     _Select('campaign.for-which-question')
                         ->name('condition_poll_id', false)
-                        ->options($poll->getPreviousPollsWithChoices()->pluck('body', 'id'))
+                        ->options($poll->getPreviousPollsWithChoices()->pluck('body_po', 'id'))
                         ->value($condition?->condition_poll_id)
                     ,
                     _Select('campaign.condition-question')

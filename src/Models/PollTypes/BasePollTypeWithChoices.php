@@ -24,17 +24,19 @@ abstract class BasePollTypeWithChoices extends BasePollType
     	return _Rows(
             _Toggle('campaign.toggle-to-associate-amounts-to-choices')
                 ->name('choices_type_temp', false)
-                ->run('() => { toggleAmountInputs() }'),
+                ->value($poll->showChoicesAmounts())
+                ->run('() => { $("#choices-multi-form").toggleClass("choices_show_amount") }'),
             _Toggle('campaign.toggle-to-associate-a-maximum-quantity-to-your-choices')
                 ->name('quantity_type_temp', false)
-                ->run('() => { toggleQuantityInputs() }'),
+                ->value($poll->showChoicesQuantities())
+                ->run('() => { $("#choices-multi-form").toggleClass("choices_show_quantity") }'),
             $this->getChoicesMultiForm($poll),
         );
     }
 
     protected function getChoicesMultiForm($poll)
     {
-    	$el = _MultiForm()->name('choices')
+    	$el = _MultiForm()->name('choices')->id('choices-multi-form')
             ->addLabel("campaign.add-a-new-item")
             ->formClass(ChoiceForm::class, [
                 'type_po' => $poll->type_po,

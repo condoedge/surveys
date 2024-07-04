@@ -25,13 +25,13 @@ return new class extends Migration
             $table->tinyInteger('text_type')->nullable();
             $table->tinyInteger('quantity_type')->nullable();
 
-            $table->text('body')->nullable();
-            $table->text('explanation')->nullable();
+            $table->text('body_po')->nullable();
+            $table->text('explanation_po')->nullable();
 
             $table->tinyInteger('ask_question_once')->nullable();
-            $table->tinyInteger('required')->nullable();
+            $table->tinyInteger('required_po')->nullable();
 
-            $table->tinyInteger('position')->nullable();
+            $table->tinyInteger('position_po')->nullable();
             
         });
     }
