@@ -22,7 +22,7 @@ class SurveysList extends Table
     public function top()
     {
         return _FlexBetween(
-            _Link()->iconCreate()->selfCreate('getItemForm')->inModal(),
+            _Link()->selfCreate('getItemForm')->inModal(),
         );
     }
 
