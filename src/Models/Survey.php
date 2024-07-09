@@ -46,6 +46,11 @@ class Survey extends ModelBaseForSurveys
 		return $this->getOrderedPolls()->filter(fn($po) => $po->shouldDisplayPoll($answer));
 	}
 
+	public function getEditSurveyRoute()
+	{
+		return route('survey.edit', ['id' => $this->id]);
+	}
+
 	/* ACTIONS */
 	public function createNextPollSection($type = null)
 	{

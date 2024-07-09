@@ -30,7 +30,7 @@ class SurveysList extends Table
     {
         return _TableRow(
             _Html($survey->name_sv),
-        )->href('survey.edit', ['id' => $survey->id]);
+        )->href($survey->getEditSurveyRoute());
     }
 
     public function getItemForm()

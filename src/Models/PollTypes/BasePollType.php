@@ -30,7 +30,7 @@ abstract class BasePollType
 
             if ($answer) {//Set value
                 $ap = AnswerPoll::onlyGetAnswerPoll($answer->id, $poll->id);
-                $inputEl = $inputEl->value($ap?->answer_text);
+                $inputEl = $inputEl->value($ap?->getAnswerTextForFieldValue());
             }
 
             if (!$multiPage) {

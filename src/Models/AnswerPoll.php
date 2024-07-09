@@ -23,11 +23,21 @@ class AnswerPoll extends ModelBaseForSurveys
 			return $this->answer_text;
 		}
 
-		if ((substr($this->answer_text, 0, 2) == '["') && (substr($this->answer_text, 0, -2) == '"]')) {
+		if (static::isJsonEncodedAnswer($this->answer_text)) {
 			return json_decode($this->answer_text, true);
 		}
 
 		return [$this->answer_text];
+	}
+
+	public function getAnswerTextForFieldValue()
+	{
+		return static::isJsonEncodedAnswer($this->answer_text) ? json_decode($this->answer_text, true) : $this->answer_text;
+	}
+
+	public static function isJsonEncodedAnswer($answerText)
+	{
+		return $answerText && (substr($answerText, 0, 2) == '["') && (substr($answerText, -2) == '"]');
 	}
 
 	public function getChoices()

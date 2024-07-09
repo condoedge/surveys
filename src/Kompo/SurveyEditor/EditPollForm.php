@@ -49,7 +49,7 @@ class EditPollForm extends ModalScroll
 
     public function response() 
     {
-        return redirect()->route('survey.edit', ['id' => $this->model->survey_id]);
+        return redirect($this->model->survey->getEditSurveyRoute());
     }
 
     public function headerButtons()

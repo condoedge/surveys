@@ -23,7 +23,7 @@ class SurveyForm extends ModalScroll
 
     public function response()
     {
-        return redirect()->route('survey.edit', ['id' => $this->model->id]);
+        return redirect($this->model->getEditSurveyRoute());
     }
 
     public function render()
