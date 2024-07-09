@@ -44,7 +44,7 @@ class AnswerSinglePollForm extends Form
 
         $answerText = request($condition->conditionPoll->getPollInputName());
 
-        if ($answerText == $condition->condition_choice_id) {
+        if ($condition->isFulfilled($answerText)) {
 
             $poll = $condition->poll;
             

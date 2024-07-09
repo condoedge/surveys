@@ -110,7 +110,7 @@ abstract class BasePollType
             _Toggle('campaign.toggle-to-add-a-condition-for-display')
                 ->name('has_conditions', false)->value($poll->hasConditions())
                 ->toggleId('condition-inputs', !$poll->hasConditions()),
-            _CardGray100P4(
+            _CardWhiteP4(
                 _Columns(
                     _Select('campaign.for-which-question')
                         ->name('condition_poll_id', false)
@@ -126,7 +126,7 @@ abstract class BasePollType
                     ->name('condition_choice_id', false)
                     ->optionsFromField('condition_poll_id', 'searchConditionPollChoices', 'retrieveConditionPollChoice')
                     ->value($condition?->condition_choice_id)
-            )
+            )->class('border border-gray-100')
             ->id('condition-inputs')
         );
     }

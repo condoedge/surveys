@@ -28,6 +28,26 @@ class Condition extends ModelBaseForSurveys
         ]);
     }
 
+    public function isFulfilled($answer) 
+    {
+        $answer = is_array($answer) ? $answer : [$answer];
+
+        if (!count($answer) || is_null($answer[0])) {
+            return false;
+        }
+
+        switch($this->condition_type) {
+            case self::TYPE_IS_EQUAL_TO:
+                return in_array($this->condition_choice_id, $answer);
+            case self::TYPE_ONLY_IF_EQUAL_TO:
+                return in_array($this->condition_choice_id, $answer) && count($answer) === 1;
+            case self::TYPE_IS_NOT_EQUAL_TO:
+                return !in_array($this->condition_choice_id, $answer);
+            default:
+                return true;
+        }
+    }
+
 	/* ACTIONS */
 
 	/* ELEMENTS */

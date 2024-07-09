@@ -19,6 +19,10 @@ class AnswerPoll extends ModelBaseForSurveys
 			return [];
 		}
 
+		if (is_array($this->answer_text)) {
+			return $this->answer_text;
+		}
+
 		if ((substr($this->answer_text, 0, 2) == '["') && (substr($this->answer_text, 0, -2) == '"]')) {
 			return json_decode($this->answer_text, true);
 		}

@@ -12,6 +12,11 @@ class Answer extends ModelBaseForSurveys
     public const SURVEY_COST_PANEL = 'survey-cost-panel';
 
 	/* RELATIONS */
+    public function answerPolls()
+    {
+        return $this->hasMany(AnswerPoll::class);
+    }
+
 
 	/* SCOPES */
 
@@ -67,6 +72,8 @@ class Answer extends ModelBaseForSurveys
 
     public function delete()
     {
+        $this->answerPolls()->delete();
+
         parent::delete();
     }
 

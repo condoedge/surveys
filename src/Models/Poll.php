@@ -113,7 +113,7 @@ class Poll extends ModelBaseForSurveys
 
         if ($answer && ($condition = $this->getTheCondition())) {
             $ap = AnswerPoll::onlyGetAnswerPoll($answer->id, $condition->condition_poll_id);
-            if ($condition->condition_choice_id == $ap?->answer_text) {
+            if ($condition->isFulfilled($ap?->getChoiceIdsAsArray())) {
                 return true;
             } else {
                 return false;
