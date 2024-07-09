@@ -41,7 +41,7 @@ class SurveyPollSectionsList extends Query
         return _Flex(
             _Html()->icon(_Svg('selector')->class('w-8 h-8 text-gray-400'))->class('cursor-move'),
             $content->class('flex-1 mb-2'),
-            _Delete($pollSection)->class('pl-2 mb-4'),
+            _Delete()->byKey($pollSection)->class('pl-2 mb-4'),
         );
     }
 
@@ -50,12 +50,13 @@ class SurveyPollSectionsList extends Query
         $poll = $position == 0 ? $pollSection->getFirstPoll() : $pollSection->getLastPoll();
 
         if (!$poll) {
-            return _CardWhiteP4(
+            return _CardGray200(
                 _Html('campaign.empty-section')->class('uppercase'),
                 _Html('campaign.add-a-type-of-question'),
-            )->selfPost('getAddPollForm', [
+            )->class('p-6 justify-center items-center')
+            ->selfPost('getAddPollForm', [
                 'id' => $pollSection->id,
-                'position' => $position,
+                'position_po' => $position,
             ])->inPanel('pick-poll-type-panel');
         }
 
@@ -67,7 +68,7 @@ class SurveyPollSectionsList extends Query
                         ->selfUpdate('getPollForm', [
                             'id' => $poll->id,
                         ])->inModal(),
-                    _Delete($poll)->refresh(),
+                    _Delete()->byKey($poll),
                 ),
             ),
             !$poll->hasConditions() ? null : 
@@ -84,7 +85,7 @@ class SurveyPollSectionsList extends Query
     {
         return new AddPollForm($this->surveyId, [
             'poll_section_id' => request('id'),
-            'position' => request('position'),
+            'position_po' => request('position_po'),
         ]);
     }
 }

@@ -17,16 +17,21 @@ class AnswerSurveyMultiPage extends AnswerSurveyOnePage
     {
         parent::created();
 
-        $this->currentPollId = $this->prop('current_poll_id') ?: $this->survey->pollSections()->first()->polls()->value('id');
-        $this->currentPoll = Poll::findOrFail($this->currentPollId);
+        $this->currentPollId = $this->prop('current_poll_id') ?: $this->getFirstPollIdForAnswer();
+        $this->currentPoll = Poll::find($this->currentPollId);
+        if (!$this->currentPoll) {
+            abort(403, __('This survey is incomplete!'));
+        }
+    }
+
+    protected function getFirstPollIdForAnswer()
+    {
+        return $this->survey->getVisibleOrderedPollsForAnswer($this->model)->first()->id;
     }
 
     protected function setOtherPollIds()
     {
-        $allPollIds = $this->survey->pollSections()->with('polls')->get()
-            ->flatMap(fn($ps) => $ps->polls)
-            ->filter(fn($po) => $po->shouldDisplayPoll(Poll::DISPLAY_MODE_INITIAL, $this->model))
-            ->pluck('id');
+        $allPollIds = $this->survey->getVisibleOrderedPollsForAnswer($this->model)->pluck('id');
 
         $currentPollKey = $allPollIds->search($this->currentPollId);
 
@@ -36,51 +41,75 @@ class AnswerSurveyMultiPage extends AnswerSurveyOnePage
 
     public function handle()
     {
-        $this->model->saveAnswerToSinglePoll($this->currentPollId, request('poll_answer'));
+        $this->model->saveAnswerToSinglePoll($this->currentPollId, request($this->currentPoll->getPollInputName()));
 
         $this->setOtherPollIds(); //Has to come after answer is saved
 
-        return new AnswerSurveyMultiPage($this->model->id, [
-            'current_poll_id' => $this->nextPollId,
-        ]);
+        if ($this->nextPollId) {
+            return $this->getMultiPageFormForPollId($this->nextPollId);
+        }
+
+        return $this->nextResponse();
     }
 
-    public function getSinglePollAnswerFom()
+    protected function nextResponse()
+    {
+        //
+    }
+
+    public function getBackActionPollAnswerForm()
     {
         $this->setOtherPollIds();
 
-        return new AnswerSurveyMultiPage($this->model->id, [
-            'current_poll_id' => $this->previousPollId,
-        ]);
+        if ($this->previousPollId) {
+            return $this->getMultiPageFormForPollId($this->previousPollId);
+        }
+
+        return $this->backResponse();
+    }
+
+    protected function backResponse()
+    {
+        //
+    }
+
+    protected function getMultiPageFormForPollId($pollId)
+    {
+        $multiPageForm = config('condoedge-surveys.answer-multi-page-form');
+
+        return new $multiPageForm($this->model->id, array_merge($this->basePayload(), [
+            'current_poll_id' => $pollId,
+        ]));
+    }
+
+    protected function basePayload()
+    {
+        return []; //To pass data when overriden
     }
 
     public function render() 
     {
-        $this->setOtherPollIds();
-
         return _Panel(
-            $this->answerableEls(),
+            $this->model->getAnswererNameEls(),
             _Div(
                 $this->currentPoll->getDisplayInputEls($this->model, true),
             ),
             $this->model->getTotalAnswerCostPanel(),
             _Columns(
-                $this->getBackButton(),
-                $this->getNextButton(),
+                $this->getBackButton()->class('w-full mb-4'),
+                $this->getNextButton()->class('w-full mb-4'),
             ),
-        )->class('p-6')
+        )
         ->id(static::SINGLE_POLL_ANSWER_PANEL);
     }
 
     protected function getBackButton()
     {
-        return !$this->previousPollId ? _Html() : 
-            _Button('Back')->outlined()->selfGet('getSinglePollAnswerFom')->inPanel(static::SINGLE_POLL_ANSWER_PANEL);
+        return _Button('Back')->outlined()->selfGet('getBackActionPollAnswerForm')->inPanel(static::SINGLE_POLL_ANSWER_PANEL);
     }
 
     protected function getNextButton()
     {
-        return !$this->nextPollId ? _Html() : 
-            _SubmitButton('Next')->inPanel(static::SINGLE_POLL_ANSWER_PANEL);
+        return _SubmitButton('Next')->inPanel(static::SINGLE_POLL_ANSWER_PANEL);
     }
 }

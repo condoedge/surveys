@@ -5,7 +5,7 @@ namespace Condoedge\Surveys\Kompo\SurveyEditor;
 use App\Models\Surveys\Poll;
 use App\Models\Surveys\Choice;
 use App\Models\Surveys\Condition;
-use Kompo\Auth\Common\ModalScroll;
+use Condoedge\Surveys\Kompo\Common\ModalScroll;
 
 class EditPollForm extends ModalScroll
 {
@@ -23,7 +23,7 @@ class EditPollForm extends ModalScroll
         }
 
         $this->model->type_po = $this->model->type_po ?: $this->prop('type_po');
-        $this->model->position = $this->model->position ?: $this->prop('position');
+        $this->model->position_po = $this->model->position_po ?: $this->prop('position_po');
 
         $this->model->setDefaultOptions();
     }
@@ -31,7 +31,7 @@ class EditPollForm extends ModalScroll
     public function beforeSave()
     {
         $this->model->poll_section_id = $this->model->poll_section_id ?: $this->model->survey->createNextPollSection()->id;
-        $this->model->position = $this->model->position ?: 0;
+        $this->model->position_po = $this->model->position_po ?: 0;
     }
 
     public function afterSave()

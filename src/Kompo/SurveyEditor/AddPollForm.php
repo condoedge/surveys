@@ -9,24 +9,24 @@ use Kompo\Form;
 class AddPollForm extends Form
 {
     protected $pollSectionId;
-    protected $position;
+    protected $positionPo;
 
     public $model = Survey::class;
 
     public function created() 
     {
         $this->pollSectionId = $this->prop('poll_section_id');
-        $this->position = $this->prop('position');
+        $this->positionPo = $this->prop('position_po');
     }
 
     public function render() 
     {
-        return _Rows(
+        return _CardGray100P4(
             PollTypeEnum::optionsWithLabels()->map(
                 fn($labelEls, $type) => _Rows($labelEls)->class('cursor-pointer')
                     ->selfGet('addNewPoll', ['type' => $type])->inModal()
             )
-        )->class('border-dashed border-2 border-gray-400 text-gray-700 p-4 rounded-2xl');
+        );
     }
 
     public function addNewPoll($type) 
@@ -35,7 +35,7 @@ class AddPollForm extends Form
             'type_po' => $type,
             'survey_id' => $this->model->id,
             'poll_section_id' => $this->pollSectionId,
-            'position' => $this->position,
+            'position_po' => $this->positionPo,
         ]);
     }
 }

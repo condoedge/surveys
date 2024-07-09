@@ -3,7 +3,7 @@
 namespace Condoedge\Surveys\Kompo\SurveyEditor;
 
 use App\Models\Surveys\Survey;
-use Kompo\Auth\Common\ModalScroll;
+use Condoedge\Surveys\Kompo\Common\ModalScroll;
 
 class SurveyForm extends ModalScroll
 {

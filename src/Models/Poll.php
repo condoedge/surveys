@@ -6,16 +6,14 @@ use App\Models\Surveys\Choice;
 use App\Models\Surveys\Condition;
 use App\Models\Surveys\PollSection;
 use App\Models\Surveys\AnswerPoll;
-use Kompo\Auth\Models\Model;
 
-class Poll extends Model
+class Poll extends ModelBaseForSurveys
 {
 	use \Condoedge\Surveys\Models\BelongsToSurveyTrait;
-    use \Condoedge\Surveys\Models\PollConditionRelatedTrait;
 
     use \Kompo\Database\HasTranslations;
     protected $translatable = [
-        'body',
+        'body_po',
     ];
     protected $casts = [
         'type_po' => PollTypeEnum::class,
@@ -52,6 +50,18 @@ class Poll extends Model
     }
 
 	/* CALCULATED FIELDS */
+    public function getPollInputName()
+    {
+        return 'poll_input_name_'.$this->id;
+    }
+
+    public function isOpenAnswer()
+    {
+        $ptc = $this->type_po->pollTypeClass();
+
+        return $ptc::POLL_HAS_OPEN_ANSWER;
+    }
+
     public function showChoicesAmounts()
     {
         return $this->choices()->whereNotNull('choice_amount')->count();
@@ -92,18 +102,18 @@ class Poll extends Model
             ->flatMap->polls
             ->filter(fn($poll) => $poll->hasChoices())
             ->reject(fn($poll) => $poll->id == $this->id)
-            ->reject(fn($poll) => ($poll->poll_section_id == $this->poll_section_id) && ($poll->position == 1));
+            ->reject(fn($poll) => ($poll->poll_section_id == $this->poll_section_id) && ($poll->position_po == 1));
     }
 
-    public function shouldDisplayPoll($displayMode, $answer = null)
+    public function shouldDisplayPoll($answer = null, $displayMode = null)
     {
-        if ($displayMode != Poll::DISPLAY_MODE_INITIAL) {
+        if ($displayMode && ($displayMode != Poll::DISPLAY_MODE_INITIAL)) {
             return true;
         }
 
         if ($answer && ($condition = $this->getTheCondition())) {
             $ap = AnswerPoll::onlyGetAnswerPoll($answer->id, $condition->condition_poll_id);
-            if ($condition->condition_choice_id == $ap->answer_text) {
+            if ($condition->condition_choice_id == $ap?->answer_text) {
                 return true;
             } else {
                 return false;
@@ -123,6 +133,11 @@ class Poll extends Model
     {
 
         parent::delete();
+    }
+
+    public function validateAnswer($value)
+    {
+        return $this->type_po->pollTypeClass()->validatePollAnswer($this, $value);        
     }
 
     public function setDefaultOptions()

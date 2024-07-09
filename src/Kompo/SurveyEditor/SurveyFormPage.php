@@ -12,12 +12,15 @@ class SurveyFormPage extends Form
 
     public function authorizeBoot()
     {
-        return $this->model->id; //This form only accepts an already created survey object
+        return $this->model->id && auth()->user()->can('update', $this->model); //This form only accepts an already created survey object
     }
 
     public function render()
     {
         return _Rows(
+            _FlexEnd4(
+                _Button('campaign.visualize-form')->selfGet('visualizeAnswerSurveyModal')->inModal()->class('mb-4'),
+            ),
             _Columns(
                 _CardWhiteP4(
                     _Html('campaign.type-of-question')->class('text-lg font-bold'),
@@ -37,5 +40,10 @@ class SurveyFormPage extends Form
                 )->col('col-md-8')
             )
         );
+    }
+
+    public function visualizeAnswerSurveyModal()
+    {
+        return $this->model->getSurveyDemoInModal();
     }
 }

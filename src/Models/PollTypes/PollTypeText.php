@@ -9,7 +9,7 @@ class PollTypeText extends BasePollType
 	/* DISPLAY ELEMENTS */
 	protected function mainInputEl($poll)
     {
-        return _Html($poll->body)->class('ckEditorContent');
+        return _Html($poll->body_po)->class('ckEditorContent');
     }
 
     protected function titleExplanationEls($poll)
@@ -20,6 +20,13 @@ class PollTypeText extends BasePollType
 	/* EDIT ELEMENTS */
     protected function getQuestionInfoEls($poll)
     {
-    	return _CKEditor()->name('body');
+        $pollTextEditor = function_exists('_PollTextEditor') ? _PollTextEditor() : _CKEditor();
+        
+    	return $pollTextEditor->name('body_po');
+    }
+
+    protected function getQuestionOptionsEls($poll)
+    {
+        return;
     }
 }

@@ -2,9 +2,7 @@
 
 namespace Condoedge\Surveys\Models;
 
-use Kompo\Auth\Models\Model;
-
-class Choice extends Model
+class Choice extends ModelBaseForSurveys
 {
 	use \Condoedge\Surveys\Models\BelongsToPollTrait;
 

@@ -6,6 +6,8 @@ use Condoedge\Surveys\Kompo\SurveyEditor\ChoiceForm;
 
 abstract class BasePollTypeWithChoices extends BasePollType
 {
+    public const POLL_HAS_OPEN_ANSWER = false;
+
 	/* DISPLAY ELEMENTS */
 	abstract protected function mainInputElWithoutOptions($poll);
 
@@ -59,5 +61,13 @@ abstract class BasePollTypeWithChoices extends BasePollType
         }
 
         return $el;
+    }
+
+    /* ACTIONS */
+    public function validateSpecificToType($poll, $value)
+    {
+        if ($value && !$poll->choices()->pluck('id')->contains($value)) {
+            throwValidationError('poll', 'error-translations.pick-one-of-the-choices');
+        }
     }
 }

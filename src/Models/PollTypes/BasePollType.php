@@ -10,6 +10,9 @@ use App\Models\Surveys\Poll;
 abstract class BasePollType
 {
     public const POLL_IS_A_FIELD = true;
+    public const POLL_HAS_OPEN_ANSWER = true;
+
+    /* OPTIONS CHOICES */
 
     /* OPTIONS CHOICES */
     public function setDefaultOptionsForPollType($poll)
@@ -23,7 +26,7 @@ abstract class BasePollType
         $inputEl = $this->mainInputEl($poll)->class('mb-0');
 
         if (static::POLL_IS_A_FIELD && ($displayMode != Poll::DISPLAY_MODE_EDITING)) {
-            $inputEl = $inputEl->name('poll_answer', false);
+            $inputEl = $inputEl->name($poll->getPollInputName(), false);
 
             if ($answer) {//Set value
                 $ap = AnswerPoll::onlyGetAnswerPoll($answer->id, $poll->id);
@@ -31,9 +34,7 @@ abstract class BasePollType
             }
 
             if (!$multiPage) {
-                $inputEl = $inputEl->selfPost('saveAnswerForPoll', [
-                    'poll_id' => $poll->id,
-                ])->inPanel(Answer::SURVEY_COST_PANEL);
+                $inputEl = $inputEl->submit()->inPanel(Answer::SURVEY_COST_PANEL);
 
                 foreach ($poll->getDependentConditions() as $condition) {
                     $inputEl = $inputEl->onChange(
@@ -49,7 +50,7 @@ abstract class BasePollType
         }
 
         return _Panel(
-            !$poll->shouldDisplayPoll($displayMode, $answer) ? null : _Rows(
+            !$poll->shouldDisplayPoll($answer, $displayMode) ? null : _Rows(
                 $this->titleExplanationEls($poll),
                 $inputEl,
             ),
@@ -97,14 +98,7 @@ abstract class BasePollType
     {
         return _Rows(
             _Toggle('campaign.answer-required')->name('required_po')->default(1),
-            /* TODO uncomment later 
-                currentCampaign()->isMembership() ? null : _Toggle('campaign.ask-question-once')
-                ->name('ask_question_once')->value($this->ask_question_once),
-            _Toggle('campaign.show-before-transaction')
-                ->name('show_before_transaction')
-                ->class('m-0 mr-4')
-                ->selfPost('setShowBeforeTransaction'),
-            */
+            _Toggle('campaign.ask-question-once')->name('ask_question_once'),
         );
     }
 
@@ -140,5 +134,29 @@ abstract class BasePollType
     protected function getChoicesInfoEls($poll)
     {
         //OVERRIDE
+    }
+
+    /* ACTIONS */
+    public function validatePollAnswer($poll, $value)
+    {
+        if (!static::POLL_IS_A_FIELD) {
+            return;
+        }
+
+        $this->validateIfRequired($poll, $value);
+
+        $this->validateSpecificToType($poll, $value);
+    }
+
+    protected function validateIfRequired($poll, $value)
+    {
+        if ($poll->required_po && !$value) {
+            throwValidationError($poll->getPollInputName(), 'This poll is required');
+        }  
+    }
+
+    protected function validateSpecificToType($poll, $value)
+    {
+        //OVERRIDE         
     }
 }

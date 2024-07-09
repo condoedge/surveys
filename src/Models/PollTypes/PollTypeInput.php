@@ -41,4 +41,28 @@ class PollTypeInput extends BasePollType
             parent::getQuestionOptionsEls($poll),
         );
     }
+
+    /* ACTIONS */
+    public function validateSpecificToType($poll, $value)
+    {
+        if ($poll->text_type == static::TEXT_PHONE) 
+        {
+            //eliminate every char except 0-9
+            $justNums = preg_replace("/[^0-9]/", '', $value);
+
+            //eliminate leading 1 if its there
+            if (strlen($justNums) == 11) $justNums = preg_replace("/^1/", '',$justNums);
+
+            //if we have 10 digits left, it's probably valid.
+            if(strlen($justNums) != 10){
+                throwValidationError('poll', 'error-translations.enter-valid-phone');
+            }
+        }
+        if ($poll->text_type == static::TEXT_EMAIL) 
+        {
+            if(!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                throwValidationError('poll', 'error-translations.enter-valid-email');
+            }
+        }
+    }
 }

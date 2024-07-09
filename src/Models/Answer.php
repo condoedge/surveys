@@ -2,11 +2,10 @@
 
 namespace Condoedge\Surveys\Models;
 
-use Kompo\Auth\Models\Model;
 use App\Models\Surveys\Poll;
 use App\Models\Surveys\AnswerPoll;
 
-class Answer extends Model
+class Answer extends ModelBaseForSurveys
 {
 	use \Condoedge\Surveys\Models\BelongsToSurveyTrait;
 
@@ -20,28 +19,34 @@ class Answer extends Model
 	public function getTotalAnswerCost()
     {
         return AnswerPoll::where('answer_id', $this->id)->with('poll')->get()
-        	->sum(fn($ap) => $ap->poll->shouldDisplayPoll(Poll::DISPLAY_MODE_INITIAL, $this) ? $ap->getChoicesCost() : 0);
+        	->sum(fn($ap) => $ap->poll->shouldDisplayPoll($this) ? $ap->getChoicesCost() : 0);
+    }
+
+    public static function answerPayloadColumns()
+    {
+        return [
+            'survey_id',
+            'answerable_id',
+            'answerable_type',
+            'answerer_id',
+            'answerer_type',
+        ];
     }
 
 	/* ACTIONS */
-    public static function createOrGetAnswerFromKompoClass($kompoClass)
+    public static function createOrGetAnswerFromKompoClass($answerPayload)
     {
-    	$surveyId = $kompoClass->prop('survey_id');
-    	$answerableId = $kompoClass->prop('answerable_id');
-    	$answerableType = $kompoClass->prop('answerable_type');
-
-    	$answer = Answer::forSurvey($surveyId)
-    		->where('answerable_id', $answerableId)
-    		->where('answerable_type', $answerableType)
-    		->first();
+    	$answer = static::query();
+        foreach (static::answerPayloadColumns() as $col) {
+            $answer = $answer->where($col, $answerPayload[$col]);
+        }
+        $answer = $answer->first();
 
     	if (!$answer) {
-	        $answer = new Answer();
-	        $answer->survey_id = $surveyId;
-	        $answer->answerable_id = $answerableId;
-	        $answer->answerable_type = $answerableType;
-	        $answer->answerer_id = $kompoClass->prop('answerer_id');
-	        $answer->answerer_type = $kompoClass->prop('answerer_type');
+	        $answer = new static();
+            foreach (static::answerPayloadColumns() as $col) {
+                $answer->{$col} = $answerPayload[$col];
+            }
 	        $answer->save();
 	    }
 
@@ -50,9 +55,14 @@ class Answer extends Model
 
     public function saveAnswerToSinglePoll($pollId, $pollAnswer)
     {
+        $poll = Poll::findOrFail($pollId);
+        $poll->validateAnswer($pollAnswer);
+
         $ap = AnswerPoll::createOrGetAnswerPoll($this->id, $pollId);
         $ap->answer_text = $pollAnswer;
         $ap->save();
+
+        return $ap;
     }
 
     public function delete()
@@ -61,12 +71,17 @@ class Answer extends Model
     }
 
 	/* ELEMENTS */
-	public function getTotalAnswerCostPanel()
+	public function getAnswererNameEls()
+    {
+        //Override
+    }
+
+    public function getTotalAnswerCostPanel()
     {
         return !$this->survey->hasChoicesWithAmounts() ? _Html() : 
-	        _Panel(
-	        	$this->getTotalAnswerCostEls()
-	        )->id(static::SURVEY_COST_PANEL);
+            _Panel(
+                $this->getTotalAnswerCostEls()
+            )->id(static::SURVEY_COST_PANEL);
     }
 
 	public function getTotalAnswerCostEls()
@@ -74,6 +89,6 @@ class Answer extends Model
         return _FlexBetween(
         	_Html('Total'),
         	_Currency($this->getTotalAnswerCost()),
-        );
+        )->class('font-bold text-2xl my-8');
     }
 }

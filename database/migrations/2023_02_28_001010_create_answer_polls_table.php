@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('answer_id')->constrained();
             $table->foreignId('poll_id')->constrained();
             $table->text('answer_text')->nullable();
+            $table->tinyInteger('is_open_answer')->nullable();
             
         });
     }

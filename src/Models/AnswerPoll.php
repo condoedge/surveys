@@ -2,10 +2,9 @@
 
 namespace Condoedge\Surveys\Models;
 
-use Kompo\Auth\Models\Model;
 use App\Models\Surveys\Choice;
 
-class AnswerPoll extends Model
+class AnswerPoll extends ModelBaseForSurveys
 {
 	use \Condoedge\Surveys\Models\BelongsToPollTrait;
 
@@ -14,8 +13,12 @@ class AnswerPoll extends Model
 	/* SCOPES */
 
 	/* CALCULATED FIELDS */
-	public function getAnswerTextAsArray()
+	public function getChoiceIdsAsArray()
 	{
+		if ($this->is_open_answer) {
+			return [];
+		}
+
 		if ((substr($this->answer_text, 0, 2) == '["') && (substr($this->answer_text, 0, -2) == '"]')) {
 			return json_decode($this->answer_text, true);
 		}
@@ -23,10 +26,22 @@ class AnswerPoll extends Model
 		return [$this->answer_text];
 	}
 
+	public function getChoices()
+	{
+		return Choice::whereIn('id', $this->getChoiceIdsAsArray())->get();
+	}
+
 	public function getChoicesCost()
 	{
-		return Choice::whereIn('id', $this->getAnswerTextAsArray())->sum('choice_amount');
+		return $this->getChoices()->sum('choice_amount');
 	}
+
+	public function getAnswerDescriptionText()
+	{
+		return $this->is_open_answer ? $this->answer_text : 
+			$this->getChoices()->map(fn($choice) => $choice->choice_content)->implode(', ');
+	}
+
 
 	/* ACTIONS */
     public static function createOrGetAnswerPoll($answerId, $pollId)
@@ -34,9 +49,10 @@ class AnswerPoll extends Model
     	$ap = static::onlyGetAnswerPoll($answerId, $pollId);
 
     	if (!$ap) {
-	        $ap = new AnswerPoll();
+	        $ap = new static();
 	        $ap->poll_id = $pollId;
 	        $ap->answer_id = $answerId;
+	        $ap->is_open_answer = $ap->poll->isOpenAnswer() ? 1 : 0;
 	    }
 
         $ap->save();
@@ -46,7 +62,7 @@ class AnswerPoll extends Model
 
     public static function onlyGetAnswerPoll($answerId, $pollId)
     {
-    	return AnswerPoll::forPoll($pollId)
+    	return static::forPoll($pollId)
     		->where('answer_id', $answerId)
     		->first();
     }

@@ -2,9 +2,7 @@
 
 namespace Condoedge\Surveys\Models;
 
-use Kompo\Auth\Models\Model;
-
-class PollSection extends Model
+class PollSection extends ModelBaseForSurveys
 {
 	use \Condoedge\Surveys\Models\BelongsToSurveyTrait;
 
@@ -26,12 +24,12 @@ class PollSection extends Model
 	/* CALCULATED FIELDS */
     public function getFirstPoll()
     {
-        return $this->polls()->where('position', '<>', 1)->first();
+        return $this->polls()->where('position_po', '<>', 1)->first();
     }
 
     public function getLastPoll()
     {
-        return $this->polls()->where('position', 1)->first();
+        return $this->polls()->where('position_po', 1)->first();
     }
 
     public function isDoubleColumn()

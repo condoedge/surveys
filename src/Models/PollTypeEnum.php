@@ -4,7 +4,7 @@ namespace Condoedge\Surveys\Models;
 
 enum PollTypeEnum: int
 {
-    use \Kompo\Auth\Models\Traits\EnumKompo;
+    use \Kompo\Models\Traits\EnumKompo;
 
     case PO_TYPE_TEXT = 1;
     case PO_TYPE_SELECT = 2;
@@ -56,6 +56,6 @@ enum PollTypeEnum: int
                 _Html($text)->class('text-lg font-medium text-level2'),
                 _Html($description)->class('text-xs text-gray-500'),
             )
-        )->class('px-4 py-2');
+        )->class('border-b border-gray-200 py-2');
     }
 }

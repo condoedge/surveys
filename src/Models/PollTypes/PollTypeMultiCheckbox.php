@@ -11,4 +11,14 @@ class PollTypeMultiCheckbox extends BasePollTypeWithChoices
     }
 
 	/* EDIT ELEMENTS */
+
+    /* ACTIONS */
+    public function validateSpecificToType($poll, $value)
+    {
+        if ($value) {
+        	foreach ($value as $subvalue) {
+        		parent::validateSpecificToType($poll, $subvalue);
+        	}
+        }
+    }
 }

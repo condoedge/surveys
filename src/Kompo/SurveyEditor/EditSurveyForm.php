@@ -17,7 +17,7 @@ class EditSurveyForm extends Form
     public function render() 
     {
         return _Rows(
-
+        	$this->model->getSurveyOptionsFields(),
         );
     }
 }

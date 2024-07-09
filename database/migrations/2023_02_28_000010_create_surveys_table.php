@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('name_sv');
             $table->string('subtitle_sv')->nullable();
             $table->string('description_sv')->nullable();
-            $table->string('qrcode_sv')->nullable();
 
             $table->tinyInteger('one_page')->nullable();
             

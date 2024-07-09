@@ -11,4 +11,13 @@ class PollTypeDate extends BasePollType
     }
 
 	/* EDIT ELEMENTS */
+
+    /* ACTIONS */
+    public function validateSpecificToType($poll, $value)
+    {
+        if (\DateTime::createFromFormat('Y-m-d', $value) == false) 
+        {
+            throwValidationError('poll', 'error-translations.fill-field');
+        }
+    }
 }

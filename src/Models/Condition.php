@@ -2,9 +2,7 @@
 
 namespace Condoedge\Surveys\Models;
 
-use Kompo\Auth\Models\Model;
-
-class Condition extends Model
+class Condition extends ModelBaseForSurveys
 {
 	use \Condoedge\Surveys\Models\BelongsToPollTrait;
 
@@ -13,6 +11,10 @@ class Condition extends Model
     const TYPE_ONLY_IF_EQUAL_TO = 3;
 
 	/* RELATIONS */
+    public function conditionPoll()
+    {
+        return $this->belongsTo(Poll::class, 'condition_poll_id');
+    }
 
 	/* SCOPES */
 

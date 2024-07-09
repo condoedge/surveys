@@ -2,30 +2,22 @@
 
 namespace Condoedge\Surveys\Models;
 
-use Kompo\Auth\Models\Model;
 use App\Models\Surveys\PollSection;
+use App\Models\Surveys\Poll;
+use App\Models\Teams\Team;
 
-class Survey extends Model
+class Survey extends ModelBaseForSurveys
 {
-	use \Kompo\Auth\Models\Teams\BelongsToTeamTrait;
-	use \Kompo\Auth\Models\Files\MorphManyFilesTrait;
-
-	use \Condoedge\Crm\Models\HasQrCodeTrait;
-	public const QRCODE_LENGTH = 8;
-	public const QRCODE_COLUMN_NAME = 'qrcode_sv';
-
 	protected $casts = [
 
 	];
 
-	public function save(array $options = [])
+	/* RELATIONS */
+	public function team()
     {
-        $this->setQrCodeIfEmpty();
-
-        parent::save();
+        return $this->belongsTo(Team::class);
     }
 
-	/* RELATIONS */
 	public function pollSections()
 	{
 		return $this->hasMany(PollSection::class)->orderPs();
@@ -44,6 +36,16 @@ class Survey extends Model
 		return Choice::forPoll($this->polls()->pluck('id'))->whereNotNull('choice_amount')->count();
 	}
 
+	public function getOrderedPolls()
+	{
+		return $this->pollSections()->with('polls')->get()->flatMap(fn($ps) => $ps->polls);
+	}
+
+	public function getVisibleOrderedPollsForAnswer($answer)
+	{
+		return $this->getOrderedPolls()->filter(fn($po) => $po->shouldDisplayPoll($answer));
+	}
+
 	/* ACTIONS */
 	public function createNextPollSection($type = null)
 	{
@@ -56,4 +58,33 @@ class Survey extends Model
 	}
 
 	/* ELEMENTS */
+	public function getSurveyOptionsFields()
+	{
+		return _Rows(
+			_Toggle()->name('one_page')->label('campaign.is-on-one-page')->submit(),
+		);
+	}
+
+	public function getSurveyAnsweredInModal($payload)
+	{
+		$onePageForm = config('condoedge-surveys.answer-one-page-form');
+		$multiPageForm = config('condoedge-surveys.answer-multi-page-form');
+
+		return _Rows(
+            $this->one_page ? 
+                new $onePageForm(null, $payload) : 
+                new $multiPageForm(null, $payload),
+        );
+	}
+
+	public function getSurveyDemoInModal()
+	{
+		return $this->getSurveyAnsweredInModal([
+            'survey_id' => $this->id,
+            'answerable_id' => auth()->id(),
+            'answerable_type' => 'user',
+            'answerer_id' => auth()->id(),
+            'answerer_type' => 'user',
+        ]);
+	}
 }
