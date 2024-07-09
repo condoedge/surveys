@@ -7,9 +7,7 @@ class PollTypeSelect extends BasePollTypeWithChoices
 	/* DISPLAY ELEMENTS */
 	protected function mainInputElWithoutOptions($poll)
     {
-        return _LinkGroup()
-            ->containerClass('space-y-2')
-            ->optionClass('cursor-pointer radioChoice');
+        return _Select();
     }
 
 	/* EDIT ELEMENTS */

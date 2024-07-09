@@ -3,6 +3,7 @@
 namespace Condoedge\Surveys\Models\PollTypes;
 
 use Condoedge\Surveys\Kompo\SurveyEditor\ChoiceForm;
+use App\Models\Surveys\Choice;
 
 abstract class BasePollTypeWithChoices extends BasePollType
 {
@@ -26,11 +27,11 @@ abstract class BasePollTypeWithChoices extends BasePollType
     	return _Rows(
             _Toggle('campaign.toggle-to-associate-amounts-to-choices')
                 ->name('choices_type_temp', false)
-                ->value($poll->showChoicesAmounts())
+                ->value($poll->hasChoicesAmounts())
                 ->run('() => { $("#choices-multi-form").toggleClass("choices_show_amount") }'),
             _Toggle('campaign.toggle-to-associate-a-maximum-quantity-to-your-choices')
                 ->name('quantity_type_temp', false)
-                ->value($poll->showChoicesQuantities())
+                ->value($poll->hasChoicesQuantities())
                 ->run('() => { $("#choices-multi-form").toggleClass("choices_show_quantity") }'),
             $this->getChoicesMultiForm($poll),
         );
@@ -52,11 +53,11 @@ abstract class BasePollTypeWithChoices extends BasePollType
                 _Th(''),
             ])->preloadIfEmpty();
 
-        if ($poll->showChoicesAmounts()) {
+        if ($poll->hasChoicesAmounts()) {
             $el->class('choices_show_amount');
         }
 
-        if ($poll->showChoicesQuantities()) {
+        if ($poll->hasChoicesQuantities()) {
             $el->class('choices_show_quantity');
         }
 
@@ -67,7 +68,14 @@ abstract class BasePollTypeWithChoices extends BasePollType
     public function validateSpecificToType($poll, $value)
     {
         if ($value && !$poll->choices()->pluck('id')->contains($value)) {
-            throwValidationError('poll', 'error-translations.pick-one-of-the-choices');
+            throwValidationError($poll->getPollInputName(), 'error-translations.pick-one-of-the-choices');
+        }
+
+        if ($value && $poll->hasChoicesQuantities()) {
+            $choice = Choice::findOrFail($value);
+            if ($choice->remainingQuantity() <= 0) {
+                throwValidationError($poll->getPollInputName(), 'Sorry, the last available item has just been reserved');
+            }
         }
     }
 }

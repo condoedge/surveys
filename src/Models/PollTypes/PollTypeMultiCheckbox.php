@@ -4,6 +4,8 @@ namespace Condoedge\Surveys\Models\PollTypes;
 
 class PollTypeMultiCheckbox extends BasePollTypeWithChoices
 {
+    public const POLL_HAS_ARRAY_ANSWER = true;
+
 	/* DISPLAY ELEMENTS */
 	protected function mainInputElWithoutOptions($poll)
     {

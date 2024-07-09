@@ -9,7 +9,7 @@ class PollTypeRating extends BasePollTypeWithChoices
     {
         return _ButtonGroup()
             ->optionClass('px-4 py-2 text-center cursor-pointer')
-            ->selectedClass('bg-level3 text-white font-medium', 'bg-gray-200 text-level3 font-medium');
+            ->selectedClass('bg-level3 text-white font-medium SURVEY_selected', 'bg-gray-200 text-level3 font-medium');
     }
 
 	/* EDIT ELEMENTS */

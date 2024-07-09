@@ -3,12 +3,17 @@
 namespace Condoedge\Surveys\Models;
 
 use App\Models\Surveys\Choice;
+use App\Models\Surveys\Answer;
 
 class AnswerPoll extends ModelBaseForSurveys
 {
 	use \Condoedge\Surveys\Models\BelongsToPollTrait;
 
 	/* RELATIONS */
+    public function answer()
+    {
+        return $this->belongsTo(Answer::class);
+    }
 
 	/* SCOPES */
 

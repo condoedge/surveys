@@ -11,7 +11,7 @@ class PollTypeBinary extends BasePollTypeWithChoices
             ->containerClass('flex space-x-4 mb-1')
             ->optionClass('cursor-pointer p-4 text-center border border-gray-200 rounded-2xl w-full')
             //->selectedStyle('background-color: ' . $this->survey?->campaign?->campaign_color . '!important;')
-            ->selectedClass('text-white SURVEY_selected font-semibold', 'bg-white text-level2 font-semibold');
+            ->selectedClass('bg-level1 font-bold text-white SURVEY_selected', 'bg-white text-level2');
     }
 
 	/* EDIT ELEMENTS */

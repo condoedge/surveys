@@ -11,6 +11,7 @@ abstract class BasePollType
 {
     public const POLL_IS_A_FIELD = true;
     public const POLL_HAS_OPEN_ANSWER = true;
+    public const POLL_HAS_ARRAY_ANSWER = false;
 
     /* OPTIONS CHOICES */
 

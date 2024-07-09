@@ -55,19 +55,29 @@ class Poll extends ModelBaseForSurveys
         return 'poll_input_name_'.$this->id;
     }
 
+    public function getPollTypeClass()
+    {
+        return $this->type_po->pollTypeClass();
+    }
+
     public function isOpenAnswer()
     {
-        $ptc = $this->type_po->pollTypeClass();
-
+        $ptc = $this->getPollTypeClass();
         return $ptc::POLL_HAS_OPEN_ANSWER;
     }
 
-    public function showChoicesAmounts()
+    public function hasArrayAnswer()
+    {
+        $ptc = $this->getPollTypeClass();
+        return $ptc::POLL_HAS_ARRAY_ANSWER;
+    }
+
+    public function hasChoicesAmounts()
     {
         return $this->choices()->whereNotNull('choice_amount')->count();
     }
 
-    public function showChoicesQuantities()
+    public function hasChoicesQuantities()
     {
         return $this->choices()->whereNotNull('choice_max_quantity')->count();
     }
@@ -137,12 +147,12 @@ class Poll extends ModelBaseForSurveys
 
     public function validateAnswer($value)
     {
-        return $this->type_po->pollTypeClass()->validatePollAnswer($this, $value);        
+        return $this->getPollTypeClass()->validatePollAnswer($this, $value);        
     }
 
     public function setDefaultOptions()
     {
-        return $this->type_po->pollTypeClass()->setDefaultOptionsForPollType($this);        
+        return $this->getPollTypeClass()->setDefaultOptionsForPollType($this);        
     }
 
     public function preloadDefaultChoice($content)
@@ -167,22 +177,22 @@ class Poll extends ModelBaseForSurveys
 	/* ELEMENTS */
     public function getDisplayPostConditionEls($answer = null)
     {
-        return $this->type_po->pollTypeClass()->getDisplayInputs($this, Poll::DISPLAY_MODE_CONDITION_PASSED, $answer);
+        return $this->getPollTypeClass()->getDisplayInputs($this, Poll::DISPLAY_MODE_CONDITION_PASSED, $answer);
     }
 
     public function getDisplayInputEls($answer = null, $multiPage = false)
     {
-        return $this->type_po->pollTypeClass()->getDisplayInputs($this, Poll::DISPLAY_MODE_INITIAL, $answer, $multiPage);
+        return $this->getPollTypeClass()->getDisplayInputs($this, Poll::DISPLAY_MODE_INITIAL, $answer, $multiPage);
     }
 
     public function getPreviewInputEls()
     {
-        return $this->type_po->pollTypeClass()->getDisplayInputs($this, Poll::DISPLAY_MODE_EDITING);
+        return $this->getPollTypeClass()->getDisplayInputs($this, Poll::DISPLAY_MODE_EDITING);
     }
 
     public function getEditInputs()
     {
-        return $this->type_po->pollTypeClass()->getEditInputs($this);
+        return $this->getPollTypeClass()->getEditInputs($this);
     }
 
 }

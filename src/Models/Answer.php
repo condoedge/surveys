@@ -18,7 +18,11 @@ class Answer extends ModelBaseForSurveys
     }
 
 
-	/* SCOPES */
+	/* SCOPES */    
+    public function scopeLockedAnswer($query)
+    {
+        $query->where('answer_locked', 1);
+    }
 
 	/* CALCULATED FIELDS */    
 	public function getTotalAnswerCost()
