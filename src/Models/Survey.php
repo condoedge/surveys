@@ -90,6 +90,8 @@ class Survey extends ModelBaseForSurveys
             'answerable_type' => 'user',
             'answerer_id' => auth()->id(),
             'answerer_type' => 'user',
+			
+			'is_demo_mode' => 1,
         ]);
 	}
 }
