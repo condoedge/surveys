@@ -1,6 +1,6 @@
 <?php
 
-use Condoedge\Surveys\Models\Poll;
+use Condoedge\Surveys\Models\PollTypeEnum;
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('survey_id')->constrained();
             $table->foreignId('poll_section_id')->constrained();
 
-            $table->tinyInteger('type_po')->default(Poll::PO_TYPE_TEXT);
+            $table->tinyInteger('type_po')->default(PollTypeEnum::PO_TYPE_TEXT);
             $table->tinyInteger('choices_type')->nullable();
             $table->tinyInteger('text_type')->nullable();
             $table->tinyInteger('quantity_type')->nullable();
