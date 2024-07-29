@@ -43,6 +43,11 @@ class Poll extends ModelBaseForSurveys
         return $this->hasMany(Choice::class);
     }
 
+    public function answerPolls()
+    {
+        return $this->hasMany(AnswerPoll::class);
+    }
+
 	/* SCOPES */
     public function scopeOrderPo($query)
     {
@@ -64,6 +69,12 @@ class Poll extends ModelBaseForSurveys
     {
         $ptc = $this->getPollTypeClass();
         return $ptc::POLL_HAS_OPEN_ANSWER;
+    }
+
+    public function hasNoAnswer()
+    {
+        $ptc = $this->getPollTypeClass();
+        return !$ptc::POLL_IS_A_FIELD;
     }
 
     public function hasArrayAnswer()
