@@ -51,11 +51,11 @@ enum PollTypeEnum: int
     public static function pollTypeLabel($text, $icon, $description)
     {
         return _Flex4(
-            _Sax($icon, 30)->class('text-gray-500'),
+            _Sax($icon, 30)->class('text-level3'),
             _Rows(
                 _Html($text)->class('text-lg font-medium text-level2'),
-                _Html($description)->class('text-xs text-gray-500'),
+                _Html($description)->class('text-xs text-gray-600'),
             )
-        )->class('border-b border-gray-200 py-2');
+        )->class('border-b border-gray-200 py-2 px-2');
     }
 }

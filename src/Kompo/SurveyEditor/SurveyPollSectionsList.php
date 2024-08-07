@@ -72,7 +72,7 @@ class SurveyPollSectionsList extends Query
                 ),
             ),
             !$poll->hasConditions() ? null : 
-                _Pill('campaign.display-condition')->class('absolute right-4 top-2 bg-warning'),
+                _Pill('campaign.display-condition')->class('absolute right-4 top-2 bg-warning text-white'),
         )->class('relative');
     }
 

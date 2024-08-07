@@ -38,9 +38,9 @@ class ChoiceForm extends Form
     {
         return $this->model->id ?
 
-            _Link()->icon(_Sax('trash', 16)->class('text-gray-500 ml-2'))->selfDelete('deleteChoice', ['id' => $this->model->id])->emitDirect('deleted') :
+            _Link()->icon(_Sax('trash', 16)->class('text-gray-500 ml-1'))->selfDelete('deleteChoice', ['id' => $this->model->id])->emitDirect('deleted') :
 
-            _Link()->icon(_Sax('trash', 16)->class('text-gray-500 ml-2'))->emitDirect('deleted');
+            _Link()->icon(_Sax('trash', 16)->class('text-gray-500 ml-1'))->emitDirect('deleted');
     }
 
     public function rules()

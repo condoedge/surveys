@@ -24,7 +24,7 @@ class SurveyFormPage extends Form
             _Columns(
                 _CardWhiteP4(
                     _Html('campaign.type-of-question')->class('text-lg font-bold'),
-                    _Html('campaign.click-on-a-type-to-add-it-to-your-form')->class('mb-4'),
+                    _Html('campaign.click-on-a-type-to-add-it-to-your-form')->class('mb-4 text-sm'),
                     _Panel(
                         new AddPollForm($this->model->id),
                     )->class('rounded-xl mb-4')->id('pick-poll-type-panel'),
@@ -39,7 +39,7 @@ class SurveyFormPage extends Form
                     new AddSectionForm($this->model->id),
                 )->col('col-md-8')
             )
-        );
+        )->class('-mx-8');
     }
 
     public function visualizeAnswerSurveyModal()

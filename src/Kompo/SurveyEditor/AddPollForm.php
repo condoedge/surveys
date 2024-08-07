@@ -21,7 +21,7 @@ class AddPollForm extends Form
 
     public function render() 
     {
-        return _CardGray100P4(
+        return _Cardwhite(
             PollTypeEnum::optionsWithLabels()->map(
                 fn($labelEls, $type) => _Rows($labelEls)->class('cursor-pointer')
                     ->selfGet('addNewPoll', ['type' => $type])->inModal()
