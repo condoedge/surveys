@@ -24,7 +24,9 @@ abstract class BasePollType
 	/* DISPLAY ELEMENTS */
 	public function getDisplayInputs($poll, $displayMode, $answer = null, $multiPage = false)
     {
-        $inputEl = $this->mainInputEl($poll)->class('mb-0');
+        $mainPoll = $poll->getMainPoll();
+
+        $inputEl = $this->mainInputEl($mainPoll);
 
         if (static::POLL_IS_A_FIELD && ($displayMode != Poll::DISPLAY_MODE_EDITING)) {
             $inputEl = $inputEl->name($poll->getPollInputName(), false);
@@ -37,7 +39,7 @@ abstract class BasePollType
             if (!$multiPage) {
                 $inputEl = $inputEl->submit()->inPanel(Answer::SURVEY_COST_PANEL);
 
-                foreach ($poll->getDependentConditions() as $condition) {
+                foreach ($mainPoll->getDependentConditions() as $condition) {
                     $inputEl = $inputEl->onChange(
                         fn($e) => $e->selfPost('manageDisplayForCondition', [
                             'condition_id' => $condition->id,
@@ -51,7 +53,7 @@ abstract class BasePollType
         }
 
         return _Panel(
-            !$poll->shouldDisplayPoll($answer, $displayMode) ? null : _Rows(
+            !$mainPoll->shouldDisplayPoll($answer, $displayMode) ? null : _Rows(
                 $this->titleExplanationEls($poll),
                 $inputEl,
             ),
@@ -65,14 +67,16 @@ abstract class BasePollType
 
     protected function titleExplanationEls($poll)
     {
+        $explanation = $poll->getPollExplanation();
+
         return _Rows(
             _FlexBetween(
-                _Html($poll->body_po)->class('font-semibold'),
-                !$poll->explanation_po ? null :
+                _Html($poll->getPollTitle())->class('font-semibold'),
+                !$explanation ? null :
                     _Link()->icon('question-mark-circle')->toggleId('explanation-div-'.$poll->id)
             )->class('mb-1'),
-            !$poll->explanation_po ? null : 
-                _Html($poll->explanation_po)->class('text-sm text-gray-400 mb-2')->id('explanation-div-' . $poll->id),
+            !$explanation ? null : 
+                _Html($explanation)->class('text-sm text-gray-400 mb-2')->id('explanation-div-' . $poll->id),
         );
     }
 
@@ -82,6 +86,7 @@ abstract class BasePollType
         return _Rows(
             $this->getQuestionInfoEls($poll),
             $this->getQuestionOptionsEls($poll),
+            $poll->getPollableBox(),
             $this->getConditionsBox($poll),
             $this->getChoicesInfoEls($poll),
         );
@@ -151,7 +156,9 @@ abstract class BasePollType
 
     protected function validateIfRequired($poll, $value)
     {
-        if ($poll->required_po && !$value) {
+        $mainPoll = $poll->getMainPoll();
+
+        if ($mainPoll->required_po && !$value) {
             throwValidationError($poll->getPollInputName(), 'This poll is required');
         }  
     }

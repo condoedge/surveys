@@ -3,6 +3,7 @@
 namespace Condoedge\Surveys\Models;
 
 use App\Models\Surveys\Choice;
+use App\Models\Surveys\Poll as AppPoll;
 use App\Models\Surveys\Condition;
 use App\Models\Surveys\PollSection;
 use App\Models\Surveys\AnswerPoll;
@@ -33,6 +34,16 @@ class Poll extends ModelBaseForSurveys
         return $this->belongsTo(PollSection::class);
     }
 
+    public function parentPoll()
+    {
+        return $this->belongsTo(AppPoll::class, 'poll_id');
+    }
+
+    public function subPolls()
+    {
+        return $this->hasMany(AppPoll::class, 'poll_id');
+    }
+
     public function condition()
     {
         return $this->hasOne(Condition::class);
@@ -46,6 +57,11 @@ class Poll extends ModelBaseForSurveys
     public function answerPolls()
     {
         return $this->hasMany(AnswerPoll::class);
+    }
+
+    public function pollable()
+    {
+        return $this->morphTo();
     }
 
 	/* SCOPES */
@@ -62,7 +78,27 @@ class Poll extends ModelBaseForSurveys
 
     public function getPollTypeClass()
     {
-        return $this->type_po->pollTypeClass();
+        return $this->getMainPoll()->type_po->pollTypeClass();
+    }
+
+    public function isSubPoll()
+    {
+        return $this->poll_id;
+    }
+
+    public function getMainPoll()
+    {
+        return $this->isSubPoll() ? $this->parentPoll : $this;
+    }
+
+    public function getPollTitle()
+    {
+        return $this->getMainPoll()->body_po;
+    }
+
+    public function getPollExplanation()
+    {
+        return $this->getMainPoll()->explanation_po;
     }
 
     public function isOpenAnswer()
@@ -152,8 +188,14 @@ class Poll extends ModelBaseForSurveys
 	/* ACTIONS */
     public function delete()
     {
+        $this->deleteSubPolls();
 
         parent::delete();
+    }
+
+    public function deleteSubPolls()
+    {
+        $this->subPolls->each->delete();
     }
 
     public function validateAnswer($value)
@@ -185,6 +227,11 @@ class Poll extends ModelBaseForSurveys
         return $condition;
     }
 
+    public function saveLinkedPollableInputs()
+    {
+        //Override
+    }
+
 	/* ELEMENTS */
     public function getDisplayPostConditionEls($answer = null)
     {
@@ -204,6 +251,11 @@ class Poll extends ModelBaseForSurveys
     public function getEditInputs()
     {
         return $this->getPollTypeClass()->getEditInputs($this);
+    }
+
+    public function getPollableBox()
+    {
+        //OVERRIDE
     }
 
 }

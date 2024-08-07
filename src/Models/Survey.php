@@ -8,6 +8,8 @@ use App\Models\Teams\Team;
 
 class Survey extends ModelBaseForSurveys
 {
+	public const SURVEY_ANSWER_PANELID = 'SURVEY_ANSWER_PANELID';
+
 	protected $casts = [
 
 	];
@@ -26,6 +28,11 @@ class Survey extends ModelBaseForSurveys
 	public function polls()
 	{
 		return $this->hasMany(Poll::class);
+	}
+
+	public function surveyable()
+	{
+		return $this->morphTo();
 	}
 
     /* SCOPES */

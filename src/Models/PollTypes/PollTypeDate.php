@@ -17,7 +17,7 @@ class PollTypeDate extends BasePollType
     {
         if (\DateTime::createFromFormat('Y-m-d', $value) == false) 
         {
-            throwValidationError('poll', 'error-translations.fill-field');
+            throwValidationError($poll->getPollInputName(), 'error-translations.fill-field');
         }
     }
 }

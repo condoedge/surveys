@@ -9,7 +9,7 @@ class PollTypeText extends BasePollType
 	/* DISPLAY ELEMENTS */
 	protected function mainInputEl($poll)
     {
-        return _Html($poll->body_po)->class('ckEditorContent');
+        return _Html($poll->getPollTitle())->class('ckEditorContent');
     }
 
     protected function titleExplanationEls($poll)

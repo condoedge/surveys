@@ -4,14 +4,13 @@ namespace Condoedge\Surveys\Kompo\SurveyAnswers;
 
 use App\Models\Surveys\Answer;
 use App\Models\Surveys\Poll;
+use App\Models\Surveys\Survey;
 use Kompo\Form;
 
 class AnswerSurveyMultiPage extends AnswerSurveyOnePage
 {
     protected $currentPollId;
     protected $currentPoll;
-
-    public const SINGLE_POLL_ANSWER_PANEL = 'SINGLE_POLL_ANSWER_PANEL';
 
     public function created() 
     {
@@ -39,9 +38,14 @@ class AnswerSurveyMultiPage extends AnswerSurveyOnePage
         $this->nextPollId = $allPollIds[$currentPollKey + 1] ?? null;
     }
 
-    public function handle()
+    protected function handleSavingAnswer()
     {
         $this->model->saveAnswerToSinglePoll($this->currentPollId, request($this->currentPoll->getPollInputName()));
+    }
+
+    public function handle()
+    {
+        $this->handleSavingAnswer();
 
         $this->setOtherPollIds(); //Has to come after answer is saved
 
@@ -89,7 +93,7 @@ class AnswerSurveyMultiPage extends AnswerSurveyOnePage
 
     public function render() 
     {
-        return _Panel(
+        return _Rows(
             $this->model->getAnswererNameEls(),
             _Div(
                 $this->currentPoll->getDisplayInputEls($this->model, true),
@@ -99,17 +103,16 @@ class AnswerSurveyMultiPage extends AnswerSurveyOnePage
                 $this->getBackButton()->class('w-full mb-4'),
                 $this->getNextButton()->class('w-full mb-4'),
             ),
-        )
-        ->id(static::SINGLE_POLL_ANSWER_PANEL);
+        )->class('p-4 md:p-6 max-w-lg')->style('width: 95vw');
     }
 
     protected function getBackButton()
     {
-        return _Button('Back')->outlined()->selfGet('getBackActionPollAnswerForm')->inPanel(static::SINGLE_POLL_ANSWER_PANEL);
+        return _Button('Back')->outlined()->selfGet('getBackActionPollAnswerForm')->inPanel(Survey::SURVEY_ANSWER_PANELID);
     }
 
     protected function getNextButton()
     {
-        return _SubmitButton('Next')->inPanel(static::SINGLE_POLL_ANSWER_PANEL);
+        return _SubmitButton('Next')->inPanel(Survey::SURVEY_ANSWER_PANELID);
     }
 }

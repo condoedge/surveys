@@ -45,6 +45,8 @@ class EditPollForm extends ModalScroll
         } else {
             $this->model->getTheCondition()?->delete();
         }
+
+        $this->model->saveLinkedPollableInputs();
     }
 
     public function response() 

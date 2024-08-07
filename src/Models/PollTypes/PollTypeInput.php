@@ -45,7 +45,9 @@ class PollTypeInput extends BasePollType
     /* ACTIONS */
     public function validateSpecificToType($poll, $value)
     {
-        if ($poll->text_type == static::TEXT_PHONE) 
+        $mainPoll = $poll->getMainPoll();
+        
+        if ($mainPoll->text_type == static::TEXT_PHONE) 
         {
             //eliminate every char except 0-9
             $justNums = preg_replace("/[^0-9]/", '', $value);
@@ -55,13 +57,13 @@ class PollTypeInput extends BasePollType
 
             //if we have 10 digits left, it's probably valid.
             if(strlen($justNums) != 10){
-                throwValidationError('poll', 'error-translations.enter-valid-phone');
+                throwValidationError($poll->getPollInputName(), 'error-translations.enter-valid-phone');
             }
         }
-        if ($poll->text_type == static::TEXT_EMAIL) 
+        if ($mainPoll->text_type == static::TEXT_EMAIL) 
         {
             if(!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                throwValidationError('poll', 'error-translations.enter-valid-email');
+                throwValidationError($poll->getPollInputName(), 'error-translations.enter-valid-email');
             }
         }
     }

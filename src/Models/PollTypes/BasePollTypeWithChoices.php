@@ -67,11 +67,13 @@ abstract class BasePollTypeWithChoices extends BasePollType
     /* ACTIONS */
     public function validateSpecificToType($poll, $value)
     {
-        if ($value && !$poll->choices()->pluck('id')->contains($value)) {
+        $mainPoll = $poll->getMainPoll();
+        
+        if ($value && !$mainPoll->choices()->pluck('id')->contains($value)) {
             throwValidationError($poll->getPollInputName(), 'error-translations.pick-one-of-the-choices');
         }
 
-        if ($value && $poll->hasChoicesQuantities()) {
+        if ($value && $mainPoll->hasChoicesQuantities()) {
             $choice = Choice::findOrFail($value);
             if ($choice->remainingQuantity() <= 0) {
                 throwValidationError($poll->getPollInputName(), 'Sorry, the last available item has just been reserved');
