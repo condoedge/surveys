@@ -90,16 +90,16 @@ abstract class BasePollType
     protected function getQuestionInfoEls($poll)
     {
     	return _Rows(
-            _Input('campaign.question')->name('body_po'),
-            _Input('campaign.question-sub1')->name('explanation_po'),
-        );
+            _Input('campaign.question')->name('body_po')->class('mb-2'),
+            _Input('campaign.question-sub1')->name('explanation_po')->class('mb-2'),
+        )->class('mb-6');
     }
 
     protected function getQuestionOptionsEls($poll)
     {
         return _Rows(
-            _Toggle('campaign.answer-required')->name('required_po')->default(1),
-            _Toggle('campaign.ask-question-once')->name('ask_question_once'),
+            _Toggle('campaign.answer-required')->name('required_po')->default(1)->class('mb-2'),
+            _Toggle('campaign.ask-question-once')->name('ask_question_once')->class('mb-2'),
         );
     }
 
@@ -110,24 +110,28 @@ abstract class BasePollType
         return _Div(
             _Toggle('campaign.toggle-to-add-a-condition-for-display')
                 ->name('has_conditions', false)->value($poll->hasConditions())
-                ->toggleId('condition-inputs', !$poll->hasConditions()),
-            _CardWhiteP4(
+                ->toggleId('condition-inputs', !$poll->hasConditions())
+                ->class('mb-2'),
+            _Card(
                 _Columns(
                     _Select('campaign.for-which-question')
                         ->name('condition_poll_id', false)
                         ->options($poll->getPreviousPollsWithChoices()->pluck('body_po', 'id'))
                         ->value($condition?->condition_poll_id)
+                        ->class('whiteField mb-2')
                     ,
                     _Select('campaign.condition-question')
                         ->name('condition_type', false)
                         ->options(Condition::getConditionTypes())
                         ->value($condition?->condition_type)
+                        ->class('whiteField mb-2')
                 ),
                 _Select('campaign.answer-for-the-condition')
                     ->name('condition_choice_id', false)
                     ->optionsFromField('condition_poll_id', 'searchConditionPollChoices', 'retrieveConditionPollChoice')
                     ->value($condition?->condition_choice_id)
-            )->class('border border-gray-100')
+                    ->class('whiteField mb-2')
+            )->class('bg-gray-200 py-4 px-6 !mb-2')
             ->id('condition-inputs')
         );
     }
@@ -152,7 +156,7 @@ abstract class BasePollType
     protected function validateIfRequired($poll, $value)
     {
         if ($poll->required_po && !$value) {
-            throwValidationError($poll->getPollInputName(), 'This poll is required');
+            throwValidationError($poll->getPollInputName(), 'error.this-poll-is-required');
         }  
     }
 

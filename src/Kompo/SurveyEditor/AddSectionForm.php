@@ -10,6 +10,8 @@ class AddSectionForm extends Form
 {
     public $model = Survey::class;
 
+    public $class = "mx-8";
+
     public function render() 
     {
         return _Columns(
@@ -26,7 +28,7 @@ class AddSectionForm extends Form
                 )->class('w-full')
             )->class('flex flex-col justify-center items-center cursor-pointer hover:bg-gray-200 rounded-xl p-3 pt-3')
             ->selfPost('addDoubleSection')->refresh('polls-list'),
-        )->class('border-dashed border-2 border-gray-400 text-gray-700 rounded-2xl py-2 mx-8 w-full mx-auto');
+        )->class('border-dashed border-2 border-gray-400 text-gray-700 rounded-2xl py-2 w-full mx-auto');
     }
 
     public function addSingleSection() 

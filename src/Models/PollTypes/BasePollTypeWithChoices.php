@@ -24,30 +24,31 @@ abstract class BasePollTypeWithChoices extends BasePollType
 	/* EDIT ELEMENTS */
     protected function getChoicesInfoEls($poll)
     {
-    	return _Rows(
+    	return _Card(
             _Toggle('campaign.toggle-to-associate-amounts-to-choices')
                 ->name('choices_type_temp', false)
                 ->value($poll->hasChoicesAmounts())
-                ->run('() => { $("#choices-multi-form").toggleClass("choices_show_amount") }'),
+                ->run('() => { $("#choices-multi-form").toggleClass("choices_show_amount") }')
+                ->class('mb-2'),
             _Toggle('campaign.toggle-to-associate-a-maximum-quantity-to-your-choices')
                 ->name('quantity_type_temp', false)
                 ->value($poll->hasChoicesQuantities())
                 ->run('() => { $("#choices-multi-form").toggleClass("choices_show_quantity") }'),
             $this->getChoicesMultiForm($poll),
-        );
+        )->class('bg-info bg-opacity-10 p-6 mt-6');
     }
 
     protected function getChoicesMultiForm($poll)
     {
     	$el = _MultiForm()->name('choices')->id('choices-multi-form')
-            ->addLabel("campaign.add-a-new-item")
+            ->addLabel('campaign.add-a-new-item')
             ->formClass(ChoiceForm::class, [
                 'type_po' => $poll->type_po,
                 'withAmounts' => request('choices_type_temp'),
                 'withQuantities' => request('quantity_type_temp'),
             ])
             ->asTable([
-                _Th('campaign.add-options'),
+                _Th('campaign.options'),
                 _Th('campaign.amount')->class('choice_amount_input'),
                 _Th('campaign.max-quantity')->class('choice_quantity_input'),
                 _Th(''),
@@ -68,13 +69,13 @@ abstract class BasePollTypeWithChoices extends BasePollType
     public function validateSpecificToType($poll, $value)
     {
         if ($value && !$poll->choices()->pluck('id')->contains($value)) {
-            throwValidationError($poll->getPollInputName(), 'error-translations.pick-one-of-the-choices');
+            throwValidationError($poll->getPollInputName(), 'error.pick-one-of-the-choices');
         }
 
         if ($value && $poll->hasChoicesQuantities()) {
             $choice = Choice::findOrFail($value);
             if ($choice->remainingQuantity() <= 0) {
-                throwValidationError($poll->getPollInputName(), 'Sorry, the last available item has just been reserved');
+                throwValidationError($poll->getPollInputName(), 'error.sorry-last-available-item');
             }
         }
     }
