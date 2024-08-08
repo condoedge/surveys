@@ -22,9 +22,7 @@ class AnswerSinglePollForm extends Form
 
     public function handle()
     {
-        $inputName = $this->poll->getPollInputName();
-
-        $this->model->saveAnswerToSinglePoll($this->pollId, request($inputName));
+        $this->model->saveAnswerToSinglePoll($this->pollId);
 
         return $this->model->getTotalAnswerCostEls();
     }

@@ -86,7 +86,7 @@ class Survey extends ModelBaseForSurveys
             $this->one_page ? 
                 new $onePageForm(null, $payload) : 
                 new $multiPageForm(null, $payload),
-        );
+        )->class('max-w-lg')->style('width: 95vw');
 	}
 
 	public function getSurveyDemoInModal()

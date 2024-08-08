@@ -2,7 +2,7 @@
 
 namespace Condoedge\Surveys\Kompo\Common;
 
-use Kompo\Modal;
+use App\Kompo\Common\Modal;
 
 class ModalScroll extends Modal //TODO: MERGE WITH ModalScroll from kompo/auth
 {

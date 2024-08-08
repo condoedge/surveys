@@ -40,7 +40,7 @@ class AnswerSurveyMultiPage extends AnswerSurveyOnePage
 
     protected function handleSavingAnswer()
     {
-        $this->model->saveAnswerToSinglePoll($this->currentPollId, request($this->currentPoll->getPollInputName()));
+        $this->model->saveAnswerToSinglePoll($this->currentPollId);
     }
 
     public function handle()
@@ -103,7 +103,7 @@ class AnswerSurveyMultiPage extends AnswerSurveyOnePage
                 $this->getBackButton()->class('w-full mb-4'),
                 $this->getNextButton()->class('w-full mb-4'),
             ),
-        )->class('p-4 md:p-6 max-w-lg')->style('width: 95vw');
+        )->class('p-4 md:p-6');
     }
 
     protected function getBackButton()
