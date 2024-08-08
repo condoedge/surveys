@@ -2,6 +2,8 @@
 
 namespace Condoedge\Surveys\Models;
 
+use App\Models\Surveys\Poll;
+
 class PollSection extends ModelBaseForSurveys
 {
 	use \Condoedge\Surveys\Models\BelongsToSurveyTrait;
