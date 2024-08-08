@@ -227,6 +227,24 @@ class Poll extends ModelBaseForSurveys
         return $condition;
     }
 
+    public function setPollConditionInForm()
+    {
+        $this->setOrUnsetCondition(request('condition_poll_id'));
+    }
+
+    protected function setOrUnsetCondition($conditionPollId)
+    {
+        if(request('has_conditions')) {
+            $cond = $this->getOrNewTheCondition();
+            $cond->condition_poll_id = $conditionPollId;
+            $cond->condition_choice_id = request('condition_choice_id');
+            $cond->condition_type = request('condition_type');
+            $cond->save();
+        } else {
+            $this->getTheCondition()?->delete();
+        }
+    }
+
     public function saveLinkedPollableInputs()
     {
         //Override

@@ -39,7 +39,7 @@ abstract class BasePollType
             if (!$multiPage) {
                 $inputEl = $inputEl->submit()->inPanel(Answer::SURVEY_COST_PANEL);
 
-                foreach ($mainPoll->getDependentConditions() as $condition) {
+                foreach ($poll->getDependentConditions() as $condition) {
                     $inputEl = $inputEl->onChange(
                         fn($e) => $e->selfPost('manageDisplayForCondition', [
                             'condition_id' => $condition->id,
@@ -53,7 +53,7 @@ abstract class BasePollType
         }
 
         return _Panel(
-            !$mainPoll->shouldDisplayPoll($answer, $displayMode) ? null : _Rows(
+            !$poll->shouldDisplayPoll($answer, $displayMode) ? null : _Rows(
                 $this->titleExplanationEls($poll),
                 $inputEl,
             ),

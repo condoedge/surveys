@@ -16,7 +16,7 @@ abstract class BasePollTypeWithChoices extends BasePollType
     {
         return $this->mainInputElWithoutOptions($poll)->options(
         	$poll->choices()->with('poll')->get()->mapWithKeys(fn($choice) => [
-                $choice->id => $choice->choiceLabelInHtml(),
+                $choice->id => _Html($choice->choiceLabelInHtml())->searchableBy($choice->choice_content),
             ])
         );
     }

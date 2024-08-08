@@ -39,17 +39,9 @@ class EditPollForm extends ModalScroll
 
     public function afterSave()
     {
-        if(request('has_conditions')) {
-            $cond = $this->model->getOrNewTheCondition();
-            $cond->condition_poll_id = request('condition_poll_id');
-            $cond->condition_choice_id = request('condition_choice_id');
-            $cond->condition_type = request('condition_type');
-            $cond->save();
-        } else {
-            $this->model->getTheCondition()?->delete();
-        }
-
         $this->model->saveLinkedPollableInputs();
+
+        $this->model->setPollConditionInForm(); //Should come after subpolls
     }
 
     public function response() 
