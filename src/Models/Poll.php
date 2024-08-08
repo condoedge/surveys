@@ -190,6 +190,10 @@ class Poll extends ModelBaseForSurveys
     {
         $this->deleteSubPolls();
 
+        $this->getTheCondition()?->delete();
+        $this->getDependentConditions()->each->delete();
+        $this->choices->each->delete();
+
         parent::delete();
     }
 
