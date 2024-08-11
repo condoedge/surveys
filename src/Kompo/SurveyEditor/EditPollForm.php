@@ -39,9 +39,7 @@ class EditPollForm extends ModalScroll
 
     public function afterSave()
     {
-        $this->model->saveLinkedPollableInputs();
-
-        $this->model->setPollConditionInForm(); //Should come after subpolls
+        $this->model->setPollConditionInForm(); 
     }
 
     public function response() 

@@ -12,12 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('polls', function (Blueprint $table) {
-
-            $table->foreignId('poll_id')->nullable();
-            $table->nullableMorphs('pollable');
-            $table->tinyInteger('poll_occurence')->nullable();
-
-            $table->tinyInteger('link_to_pollable_units')->nullable();
+            
+            $table->tinyInteger('link_to_pollable')->nullable();
             
         });
     }

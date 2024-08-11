@@ -93,7 +93,7 @@ class Poll extends ModelBaseForSurveys
 
     public function getPollTitle()
     {
-        return $this->getMainPoll()->body_po;
+        return $this->body_po;
     }
 
     public function getPollExplanation()
@@ -247,11 +247,6 @@ class Poll extends ModelBaseForSurveys
         } else {
             $this->getTheCondition()?->delete();
         }
-    }
-
-    public function saveLinkedPollableInputs()
-    {
-        //Override
     }
 
 	/* ELEMENTS */
