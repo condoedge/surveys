@@ -66,7 +66,7 @@ abstract class BasePollTypeWithChoices extends BasePollType
     }
 
     /* ACTIONS */
-    public function validateSpecificToType($poll, $value)
+    public function validateSpecificToType($poll, $value, $answer)
     {
         $mainPoll = $poll->getMainPoll();
         
@@ -76,7 +76,7 @@ abstract class BasePollTypeWithChoices extends BasePollType
 
         if ($value && $mainPoll->hasChoicesQuantities()) {
             $choice = Choice::findOrFail($value);
-            if ($choice->remainingQuantity() <= 0) {
+            if ($choice->remainingQuantity($answer) < 0) {
                 throwValidationError($poll->getPollInputName(), 'error.sorry-last-available-item');
             }
         }

@@ -66,7 +66,7 @@ class Answer extends ModelBaseForSurveys
     {
         $poll = Poll::findOrFail($pollId);
         $pollAnswer = request($poll->getPollInputName());
-        $poll->validateAnswer($pollAnswer);
+        $poll->validateAnswer($pollAnswer, $this);
 
         $ap = AnswerPoll::createOrGetAnswerPoll($this->id, $pollId);
         $ap->answer_text = $pollAnswer;

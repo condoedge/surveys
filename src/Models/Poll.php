@@ -202,9 +202,9 @@ class Poll extends ModelBaseForSurveys
         $this->subPolls->each->delete();
     }
 
-    public function validateAnswer($value)
+    public function validateAnswer($value, $answer)
     {
-        return $this->getPollTypeClass()->validatePollAnswer($this, $value);        
+        return $this->getPollTypeClass()->validatePollAnswer($this, $value, $answer);        
     }
 
     public function setDefaultOptions()

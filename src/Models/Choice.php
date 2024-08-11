@@ -11,19 +11,36 @@ class Choice extends ModelBaseForSurveys
 	/* SCOPES */
 
 	/* CALCULATED FIELDS */
-	public function remainingQuantity()
+	public function remainingQuantity($answer = null)
 	{
 		$initialQty = $this->choice_max_quantity;
 
-		$usedQty = AnswerPoll::forPoll($this->poll_id)->whereHas('answer', fn($q) => $q->lockedAnswer());
+		$usedQty = $this->getUsageQueryForChoice()->forPoll($this->getUsagePollIds())->whereHas('answer', fn($q) => $q->lockedAnswer())->count();
+
+		return $initialQty - $usedQty - $this->getCurrentQuantity($answer);
+	}
+
+	public function getUsageQueryForChoice()
+	{
+		$q = AnswerPoll::query();
 
 		if ($this->poll->hasArrayAnswer()) {
-			$usedQty = $usedQty->where('answer_text', 'LIKE', wildcardSpace('"'.$this->id.'"'));
+			$q = $q->where('answer_text', 'LIKE', wildcardSpace('"'.$this->id.'"'));
 		} else {
-			$usedQty = $usedQty->where('answer_text', $this->id);			
+			$q = $q->where('answer_text', $this->id);			
 		}
 
-		return $initialQty - $usedQty->count();
+		return $q;
+	}
+
+	public function getUsagePollIds()
+	{
+		return $this->poll_id;
+	}
+
+	public function getCurrentQuantity($answer)
+	{
+		return 0; //To override
 	}
 
 	/* ACTIONS */

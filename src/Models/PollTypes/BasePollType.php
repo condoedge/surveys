@@ -147,7 +147,7 @@ abstract class BasePollType
     }
 
     /* ACTIONS */
-    public function validatePollAnswer($poll, $value)
+    public function validatePollAnswer($poll, $value, $answer)
     {
         if (!static::POLL_IS_A_FIELD) {
             return;
@@ -155,7 +155,7 @@ abstract class BasePollType
 
         $this->validateIfRequired($poll, $value);
 
-        $this->validateSpecificToType($poll, $value);
+        $this->validateSpecificToType($poll, $value, $answer);
     }
 
     protected function validateIfRequired($poll, $value)
@@ -167,7 +167,7 @@ abstract class BasePollType
         }  
     }
 
-    protected function validateSpecificToType($poll, $value)
+    protected function validateSpecificToType($poll, $value, $answer)
     {
         //OVERRIDE         
     }
