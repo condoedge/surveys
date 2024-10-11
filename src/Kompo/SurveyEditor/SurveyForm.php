@@ -30,9 +30,9 @@ class SurveyForm extends ModalScroll
     {
         return _Rows(
             _Card(
-                _Input('Survey title')->name('name_sv'),
+                _Input('survey.survey-title')->name('name_sv'),
             ),
-            _SubmitButton('save'),
+            _SubmitButton('campaign.save'),
         )->class('p-8');
     }
 

@@ -48,7 +48,7 @@ abstract class BasePollType
                 }
 
                 //Last optional Action
-                $inputEl = $inputEl->alert('Answer saved!');
+                $inputEl = $inputEl->alert('survey.answer-saved');
             }
         }
 
