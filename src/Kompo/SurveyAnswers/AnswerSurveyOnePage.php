@@ -48,19 +48,22 @@ class AnswerSurveyOnePage extends Form
     {
         $firstPoll = $pollSection->getFirstPoll();
 
-        $content = new AnswerSinglePollForm($this->model->id, ['poll_id' => $firstPoll?->id]);
+        $content = $this->displayPollInOnePageSurvey($firstPoll);
 
         if($pollSection->isDoubleColumn()) {
             $lastPoll = $pollSection->getLastPoll();
             $content = _Columns(
                 $content,
-                new AnswerSinglePollForm($this->model->id, ['poll_id' => $lastPoll?->id]),
+                $this->displayPollInOnePageSurvey($lastPoll),
             );
         }
 
-        return _Rows(
-            $content
-        );
+        return $content;
+    }
+
+    protected function displayPollInOnePageSurvey($poll)
+    {
+        return new AnswerSinglePollForm($this->model->id, ['poll_id' => $poll?->id]);
     }
 
     protected function getBackButton()
