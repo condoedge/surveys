@@ -85,7 +85,7 @@ class Survey extends ModelBaseForSurveys
 	public function getSurveyOptionsFields()
 	{
 		return _Rows(
-			_Toggle()->name('one_page')->label('campaign.is-on-one-page')->submit(),
+			_Toggle()->name('one_page')->label('campaign.is-on-one-page')->default(1)->submit(),
 		);
 	}
 
@@ -104,7 +104,7 @@ class Survey extends ModelBaseForSurveys
             $this->one_page ? 
                 new $onePageForm(null, $payload) : 
                 new $multiPageForm(null, $payload),
-        )->class('max-w-lg')->style('width: 95vw');
+        )->class('max-w-xl')->style('width: 98vw');
 	}
 
 	public function getSurveyDemoInModal()

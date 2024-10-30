@@ -41,7 +41,7 @@ class AnswerSurveyOnePage extends Form
                 $this->getBackButton(),
                 $this->getNextButton(),
             ),
-        )->class('p-6');
+        )->class('pt-6 px-2');
     }
 
     protected function renderPollSection($pollSection)
