@@ -23,11 +23,13 @@ class SurveyFormPage extends Form
             ),
             _Columns(
                 _CardWhiteP4(
-                    _Html('campaign.type-of-question')->class('text-lg font-bold'),
-                    _Html('campaign.click-on-a-type-to-add-it-to-your-form')->class('mb-4 text-sm'),
-                    _Panel(
-                        new AddPollForm($this->model->id),
-                    )->class('rounded-xl mb-4')->id('pick-poll-type-panel'),
+                    !$this->model->surveyStillEditable() ? null : _Rows(
+                        _Html('campaign.type-of-question')->class('text-lg font-bold'),
+                        _Html('campaign.click-on-a-type-to-add-it-to-your-form')->class('mb-4 text-sm'),
+                        _Panel(
+                            new AddPollForm($this->model->id),
+                        )->class('rounded-xl mb-4')->id('pick-poll-type-panel'),
+                    ),
                     _Html('campaign.options')->class('text-lg font-bold'),
                     new EditSurveyForm($this->model->id),
                 )->col('col-md-4'),
@@ -36,7 +38,7 @@ class SurveyFormPage extends Form
                     new SurveyPollSectionsList([
                         'survey_id' => $this->model->id,
                     ]),
-                    new AddSectionForm($this->model->id),
+                    !$this->model->surveyStillEditable() ? null : new AddSectionForm($this->model->id),
                 )->col('col-md-8')
             )
         )->class('-mx-8');

@@ -43,6 +43,8 @@ class AddSectionForm extends Form
 
     public function addSection($type)
     {
+        $this->model->checkIfSurveyEditableOrAbort();
+
         $this->model->createNextPollSection($type);
     }
 }

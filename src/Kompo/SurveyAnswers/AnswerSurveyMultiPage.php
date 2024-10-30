@@ -25,7 +25,7 @@ class AnswerSurveyMultiPage extends AnswerSurveyOnePage
 
     protected function getFirstPollIdForAnswer()
     {
-        return $this->survey->getVisibleOrderedPollsForAnswer($this->model)->first()->id;
+        return $this->survey->getVisibleOrderedPollsForAnswer($this->model)->first()?->id;
     }
 
     protected function setOtherPollIds()
