@@ -58,7 +58,19 @@ class Survey extends ModelBaseForSurveys
 		return route('survey.edit', ['id' => $this->id]);
 	}
 
+	public function surveyStillEditable()
+	{
+		return true; //Override in your package with your own logic
+	}
+
 	/* ACTIONS */
+	public function checkIfSurveyEditableOrAbort()
+	{
+		if (!$this->surveyStillEditable()) {
+            abort(403, __('You cannot change the survey anymore'));
+        }
+	}
+
 	public function createNextPollSection($type = null)
 	{
 		$lastPollSection = new PollSection();
@@ -75,6 +87,12 @@ class Survey extends ModelBaseForSurveys
 		return _Rows(
 			_Toggle()->name('one_page')->label('campaign.is-on-one-page')->submit(),
 		);
+	}
+
+	public function getSurveyOptionsRules()
+	{
+		return [
+		];
 	}
 
 	public function getSurveyAnsweredInModal($payload)
