@@ -45,6 +45,10 @@ class PollTypeInput extends BasePollType
     /* ACTIONS */
     public function validateSpecificToType($poll, $value, $answer)
     {
+        if (!$value) {
+            return;
+        }
+
         $mainPoll = $poll->getMainPoll();
         
         if ($mainPoll->text_type == static::TEXT_PHONE) 
@@ -62,7 +66,7 @@ class PollTypeInput extends BasePollType
         }
         if ($mainPoll->text_type == static::TEXT_EMAIL) 
         {
-            if($value && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+            if(!filter_var($value, FILTER_VALIDATE_EMAIL)) {
                 throwValidationError($poll->getPollInputName(), 'error-translations.enter-valid-email');
             }
         }
