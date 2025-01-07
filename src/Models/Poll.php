@@ -163,7 +163,7 @@ class Poll extends ModelBaseForSurveys
     {
         return $this->survey->pollSections()
             ->when($this->poll_section_id,  //If null, we are appending a new pollSection
-                fn($q) => $q->where('order', '<=', $this->pollSection->order)
+                fn($q) => $q->where('order', '<=', $this->pollSection()->value('order'))
             )
             ->with('polls')->get()
             ->flatMap->polls
