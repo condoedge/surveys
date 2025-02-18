@@ -162,7 +162,7 @@ class Poll extends ModelBaseForSurveys
     public function getPreviousPollsWithChoices()
     {
         return $this->survey->pollSections()
-            ->when($this->poll_section_id,  //If null, we are appending a new pollSection
+            ->when($this->pollSection()->first()?->order,  //If null, we are appending a new pollSection
                 fn($q) => $q->where('order', '<=', $this->pollSection()->first()?->order)
             )
             ->with('polls')->get()

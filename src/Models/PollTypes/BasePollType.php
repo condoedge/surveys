@@ -37,7 +37,9 @@ abstract class BasePollType
             }
 
             if (!$multiPage) {
-                $inputEl = $inputEl->submit()->inPanel(Answer::SURVEY_COST_PANEL);
+                $inputEl = $inputEl->onBlur(
+                    fn($e) => $e->submit()->inPanel(Answer::SURVEY_COST_PANEL),
+                );
 
                 foreach ($poll->getDependentConditions() as $condition) {
                     $inputEl = $inputEl->onChange(
