@@ -37,7 +37,9 @@ abstract class BasePollType
             }
 
             if (!$multiPage) {
-                $inputEl = $inputEl->submit()->inPanel(Answer::SURVEY_COST_PANEL);
+                $inputEl = $inputEl->onBlur(
+                    fn($e) => $e->submit()->inPanel(Answer::SURVEY_COST_PANEL),
+                );
 
                 foreach ($poll->getDependentConditions() as $condition) {
                     $inputEl = $inputEl->onChange(
@@ -48,7 +50,7 @@ abstract class BasePollType
                 }
 
                 //Last optional Action
-                $inputEl = $inputEl->alert('Answer saved!');
+                $inputEl = $inputEl->alert('survey.answer-saved');
             }
         }
 
@@ -103,7 +105,7 @@ abstract class BasePollType
     protected function getQuestionOptionsEls($poll)
     {
         return _Rows(
-            _Toggle('campaign.answer-required')->name('required_po')->default(1)->class('mb-2'),
+            _Toggle('campaign.answer-required')->name('required_po')->class('mb-2'),
             _Toggle('campaign.ask-question-once')->name('ask_question_once')->class('mb-2'),
         );
     }

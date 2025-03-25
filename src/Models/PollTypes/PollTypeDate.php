@@ -15,7 +15,7 @@ class PollTypeDate extends BasePollType
     /* ACTIONS */
     public function validateSpecificToType($poll, $value, $answer)
     {
-        if (\DateTime::createFromFormat('Y-m-d', $value) == false) 
+        if ($value && (\DateTime::createFromFormat('Y-m-d', $value) == false)) 
         {
             throwValidationError($poll->getPollInputName(), 'error-translations.fill-field');
         }

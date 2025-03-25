@@ -70,6 +70,16 @@ class Poll extends ModelBaseForSurveys
         $query->orderByRaw('-`position_po` DESC');
     }
 
+    public function scopeIsPositionFirst($query)
+    {
+        $query->where('position_po', '<>', 1);
+    }
+
+    public function scopeIsPositionLast($query)
+    {
+        $query->where('position_po', 1);
+    }
+
 	/* CALCULATED FIELDS */
     public function getPollInputName()
     {
@@ -152,8 +162,8 @@ class Poll extends ModelBaseForSurveys
     public function getPreviousPollsWithChoices()
     {
         return $this->survey->pollSections()
-            ->when($this->poll_section_id,  //If null, we are appending a new pollSection
-                fn($q) => $q->where('order', '<=', $this->pollSection->order)
+            ->when($this->pollSection()->first()?->order,  //If null, we are appending a new pollSection
+                fn($q) => $q->where('order', '<=', $this->pollSection()->first()?->order)
             )
             ->with('polls')->get()
             ->flatMap->polls
@@ -193,6 +203,7 @@ class Poll extends ModelBaseForSurveys
         $this->getTheCondition()?->delete();
         $this->getDependentConditions()->each->delete();
         $this->choices->each->delete();
+        $this->answerPolls()->delete();
 
         parent::delete();
     }

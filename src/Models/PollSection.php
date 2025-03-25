@@ -26,12 +26,12 @@ class PollSection extends ModelBaseForSurveys
 	/* CALCULATED FIELDS */
     public function getFirstPoll()
     {
-        return $this->polls()->where('position_po', '<>', 1)->first();
+        return $this->polls()->isPositionFirst()->first();
     }
 
     public function getLastPoll()
     {
-        return $this->polls()->where('position_po', 1)->first();
+        return $this->polls()->isPositionLast()->first();
     }
 
     public function isDoubleColumn()

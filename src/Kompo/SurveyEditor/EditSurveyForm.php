@@ -20,4 +20,9 @@ class EditSurveyForm extends Form
         	$this->model->getSurveyOptionsFields(),
         );
     }
+
+    public function rules()
+    {
+        return $this->model->getSurveyOptionsRules();
+    }
 }
