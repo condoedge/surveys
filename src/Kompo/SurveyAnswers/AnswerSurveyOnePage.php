@@ -20,6 +20,7 @@ class AnswerSurveyOnePage extends Form
             foreach (Answer::answerPayloadColumns() as $col) {
                 $answerPayload[$col] = $this->prop($col);
             }
+
             $this->model(Answer::createOrGetAnswerFromKompoClass($answerPayload));
         }
 

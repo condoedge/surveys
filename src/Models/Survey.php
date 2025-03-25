@@ -14,6 +14,22 @@ class Survey extends ModelBaseForSurveys
 
 	];
 
+	public static function boot()
+	{
+		parent::boot();
+
+		static::creating(function ($model) {
+			if (!in_array(SurveyableContract::class, class_implements($model->surveyable))) {
+				throw new \Exception('SurveyableContract not implemented in the surveyable model.');
+
+				\Log::error('SurveyableContract not implemented in the surveyable model.', [
+					'surveyable' => $model->surveyable,
+					'model' => get_class($model),
+				]);
+			}
+		});
+	}
+
 	/* RELATIONS */
 	public function team()
     {
@@ -30,6 +46,9 @@ class Survey extends ModelBaseForSurveys
 		return $this->hasMany(Poll::class);
 	}
 
+	/**
+	 * @return \Illuminate\Database\Eloquent\Relations\MorphTo<SurveyableContract>
+	 */
 	public function surveyable()
 	{
 		return $this->morphTo();
@@ -72,9 +91,9 @@ class Survey extends ModelBaseForSurveys
 	/* ELEMENTS */
 	public function getSurveyOptionsFields()
 	{
-		return _Rows(
+		return $this->surveyable->getSurveyOptionsFields(_Rows(
 			_Toggle()->name('one_page')->label('campaign.is-on-one-page')->submit(),
-		);
+		), $this);
 	}
 
 	public function getSurveyAnsweredInModal($payload)
