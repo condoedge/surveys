@@ -82,6 +82,16 @@ class Survey extends ModelBaseForSurveys
 		return true; //Override in your package with your own logic
 	}
 
+	public function hasAmountsAssociated()
+	{
+		return true;
+	}
+
+	public function hasMaxQuantitiesAssociated()
+	{
+		return true;
+	}
+
 	/* ACTIONS */
 	public function checkIfSurveyEditableOrAbort()
 	{

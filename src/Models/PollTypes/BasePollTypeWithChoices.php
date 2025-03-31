@@ -25,12 +25,13 @@ abstract class BasePollTypeWithChoices extends BasePollType
     protected function getChoicesInfoEls($poll)
     {
     	return _Card(
-            _Toggle('campaign.toggle-to-associate-amounts-to-choices')
-                ->name('choices_type_temp', false)
-                ->value($poll->hasChoicesAmounts())
-                ->run('() => { $("#choices-multi-form").toggleClass("choices_show_amount") }')
-                ->class('mb-2'),
-            _Toggle('campaign.toggle-to-associate-a-maximum-quantity-to-your-choices')
+            !$poll->survey->hasAmountsAssociated() ? null :
+                _Toggle('campaign.toggle-to-associate-amounts-to-choices')
+                    ->name('choices_type_temp', false)
+                    ->value($poll->hasChoicesAmounts())
+                    ->run('() => { $("#choices-multi-form").toggleClass("choices_show_amount") }')
+                    ->class('mb-2'),
+            !$poll->survey->hasMaxQuantitiesAssociated() ? null : _Toggle('campaign.toggle-to-associate-a-maximum-quantity-to-your-choices')
                 ->name('quantity_type_temp', false)
                 ->value($poll->hasChoicesQuantities())
                 ->run('() => { $("#choices-multi-form").toggleClass("choices_show_quantity") }'),
