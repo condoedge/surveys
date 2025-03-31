@@ -92,6 +92,11 @@ class Survey extends ModelBaseForSurveys
 		return true;
 	}
 
+	public function hasAskQuestionOnce()
+	{
+		return true;
+	}
+
 	/* ACTIONS */
 	public function checkIfSurveyEditableOrAbort()
 	{
