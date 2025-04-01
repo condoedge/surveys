@@ -6,6 +6,7 @@ use App\Models\Surveys\Poll;
 use App\Models\Surveys\Choice;
 use App\Models\Surveys\Condition;
 use Condoedge\Surveys\Kompo\Common\ModalScroll;
+use Illuminate\Validation\Rule;
 
 class EditPollForm extends ModalScroll
 {
@@ -87,8 +88,19 @@ class EditPollForm extends ModalScroll
     public function rules()
     {
     	return [
-            'choices.*.choice_amount' => 'required_unless:choices_type_temp,0|nullable|numeric',
-            'choices.*.choice_max_quantity' => 'required_unless:quantity_type_temp,0|nullable|numeric',
+            'choices.*.choice_amount' => [
+                Rule::requiredIf(function () {
+                    return request('choices_type_temp');
+                }),
+                'nullable', 'numeric'
+            ],
+            'choices.*.choice_max_quantity' => [
+                Rule::requiredIf(function () {
+                    return request('quantity_type_temp');
+                }),
+                'nullable',
+                'numeric',
+            ],
             'condition_poll_id' => 'required_unless:has_conditions,0|nullable',
             'condition_type' => 'required_unless:has_conditions,0|nullable',
             'condition_choice_id' => 'required_unless:has_conditions,0|nullable'
