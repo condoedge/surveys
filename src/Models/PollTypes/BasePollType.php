@@ -13,6 +13,8 @@ abstract class BasePollType
     public const POLL_HAS_OPEN_ANSWER = true;
     public const POLL_HAS_ARRAY_ANSWER = false;
 
+    public const DEFAULT_TRIGGER = 'onBlur';
+
     /* OPTIONS CHOICES */
 
     /* OPTIONS CHOICES */
@@ -37,7 +39,10 @@ abstract class BasePollType
             }
 
             if (!$multiPage) {
-                $inputEl = $inputEl->onBlur(
+
+                $defaultTrigger = static::DEFAULT_TRIGGER;
+
+                $inputEl = $inputEl->{$defaultTrigger}(
                     fn($e) => $e->submit()->inPanel(Answer::SURVEY_COST_PANEL),
                 );
 

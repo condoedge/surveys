@@ -6,6 +6,8 @@ class PollTypeMultiCheckbox extends BasePollTypeWithChoices
 {
     public const POLL_HAS_ARRAY_ANSWER = true;
 
+    public const DEFAULT_TRIGGER = 'onChange';
+
 	/* DISPLAY ELEMENTS */
 	protected function mainInputElWithoutOptions($poll)
     {
