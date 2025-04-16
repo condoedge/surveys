@@ -4,7 +4,7 @@ namespace Condoedge\Surveys\Kompo\SurveyEditor;
 
 use App\Models\Surveys\Choice;
 use Condoedge\Surveys\Models\PollTypeEnum;
-use Kompo\Form;
+use Condoedge\Utils\Kompo\Common\Form;
 
 class ChoiceForm extends Form
 {

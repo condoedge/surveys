@@ -4,7 +4,7 @@ namespace Condoedge\Surveys\Kompo\SurveyEditor;
 
 use App\Models\Surveys\PollSection;
 use App\Models\Surveys\Survey;
-use Kompo\Query;
+use Condoedge\Utils\Kompo\Common\Query;
 
 class SurveyPollSectionsList extends Query
 {
