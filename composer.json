@@ -10,7 +10,8 @@
     "minimum-stability": "stable",
     "require": {
         "php": "^7.3|^8.0",
-        "laravel/framework": ">=5.6.0"
+        "laravel/framework": ">=5.6.0",
+        "condoedge/utils": "^0.0.18"
     },
     "extra": {
         "laravel": {
