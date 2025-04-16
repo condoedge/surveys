@@ -4,7 +4,7 @@ namespace Condoedge\Surveys\Kompo\SurveyEditor;
 
 use App\Models\Surveys\PollSection;
 use App\Models\Surveys\Survey;
-use Kompo\Query;
+use Condoedge\Utils\Kompo\Common\Query;
 
 class SurveyPollSectionsList extends Query
 {
@@ -48,7 +48,7 @@ class SurveyPollSectionsList extends Query
         return _Flex(
             !$this->surveyStillEditable ? null : _Html()->icon(_Svg('selector')->class('w-8 h-8 text-gray-400'))->class('cursor-move'),
             $content?->class('flex-1 mb-2'),
-            !$this->surveyStillEditable ? null : _Delete()->byKey($pollSection)->class('pl-2 mb-4'),
+            !$this->surveyStillEditable ? null : _Delete($pollSection)->class('pl-2 mb-4'),
         );
     }
 
@@ -75,7 +75,7 @@ class SurveyPollSectionsList extends Query
                         ->selfUpdate('getPollForm', [
                             'id' => $poll->id,
                         ])->inModal(),
-                    _Delete()->byKey($poll),
+                    _Delete($poll),
                 ),
             ),
             !$poll->hasConditions() ? null : 

@@ -2,9 +2,9 @@
 
 namespace Condoedge\Surveys\Models;
 
-use Kompo\Models\ModelWithMetaData;
+use Condoedge\Utils\Models\Model;
 
-class ModelBaseForSurveys extends ModelWithMetaData
+class ModelBaseForSurveys extends Model
 {
 	/* RELATIONS */
 

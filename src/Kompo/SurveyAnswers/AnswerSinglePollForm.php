@@ -5,7 +5,7 @@ namespace Condoedge\Surveys\Kompo\SurveyAnswers;
 use App\Models\Surveys\Answer;
 use App\Models\Surveys\Condition;
 use App\Models\Surveys\Poll;
-use Kompo\Form;
+use Condoedge\Utils\Kompo\Common\Form;
 
 class AnswerSinglePollForm extends Form
 {

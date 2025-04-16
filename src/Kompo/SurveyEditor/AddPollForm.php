@@ -4,7 +4,7 @@ namespace Condoedge\Surveys\Kompo\SurveyEditor;
 
 use Condoedge\Surveys\Models\PollTypeEnum;
 use App\Models\Surveys\Survey;
-use Kompo\Form;
+use Condoedge\Utils\Kompo\Common\Form;
 
 class AddPollForm extends Form
 {

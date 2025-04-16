@@ -2,10 +2,8 @@
 
 namespace Condoedge\Surveys\Kompo\SurveyAnswers;
 
-use App\Models\Surveys\Answer;
 use App\Models\Surveys\Poll;
 use App\Models\Surveys\Survey;
-use Kompo\Form;
 
 class AnswerSurveyMultiPage extends AnswerSurveyOnePage
 {

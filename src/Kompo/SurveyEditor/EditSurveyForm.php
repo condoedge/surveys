@@ -3,7 +3,7 @@
 namespace Condoedge\Surveys\Kompo\SurveyEditor;
 
 use App\Models\Surveys\Survey;
-use Kompo\Form;
+use Condoedge\Utils\Kompo\Common\Form;
 
 class EditSurveyForm extends Form
 {
