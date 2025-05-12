@@ -103,7 +103,13 @@ class Poll extends ModelBaseForSurveys
 
     public function getPollTitle()
     {
-        return $this->body_po;
+        $pollRequired = $this->required_po ? ('<span class="text-danger text-lg">*</span>') : '';
+        return $this->body_po . $pollRequired;
+    }
+
+    public function getPollRequiredPill()
+    {
+        return !$this->required_po ? null : _Pill('campaign.answer-required');
     }
 
     public function getPollExplanation()

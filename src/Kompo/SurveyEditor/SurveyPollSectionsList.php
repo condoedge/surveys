@@ -80,6 +80,8 @@ class SurveyPollSectionsList extends Query
             ),
             !$poll->hasConditions() ? null : 
                 _Pill('campaign.display-condition')->class('absolute right-4 top-2 bg-warning text-white'),
+                
+            $poll->getPollRequiredPill()?->class('absolute right-4 bottom-2 bg-danger text-white'),
         )->class('relative');
     }
 
