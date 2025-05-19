@@ -18,7 +18,9 @@ class PollTypeInput extends BasePollType
             self::TEXT_LONG => _Textarea(),
             self::TEXT_PHONE => _Input(),
             self::TEXT_EMAIL => _Input()->type('email'),
-            self::TEXT_ADDRESS => _Input(),
+            self::TEXT_ADDRESS => _Place()->defaultCenter(45.5017, -73.5673)->noDefaultUi()->componentRestrictions([
+                'country' => ['ca']
+            ]),
             default => _Input(),
         };
 
@@ -70,5 +72,25 @@ class PollTypeInput extends BasePollType
                 throwValidationError($poll->getPollInputName(), 'error-translations.enter-valid-email');
             }
         }
+    }
+
+    public static function transformAnswer($poll, $value)
+    {
+        $mainPoll = $poll->getMainPoll();
+        
+        if ($mainPoll->text_type == static::TEXT_ADDRESS) 
+        {
+            $place = \Kompo\Place::placeToDB($value[0] ?? null);
+
+            return collect([
+                'street_number',
+                'street',
+                'city',
+                'state',
+                'postal_code',
+            ])->map(fn($key) => $place[$key] ?? '')->implode(', ');
+        }
+
+        return $value;
     }
 }

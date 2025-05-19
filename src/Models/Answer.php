@@ -65,7 +65,7 @@ class Answer extends ModelBaseForSurveys
     public function saveAnswerToSinglePoll($pollId)
     {
         $poll = Poll::findOrFail($pollId);
-        $pollAnswer = request($poll->getPollInputName());
+        $pollAnswer = $poll->getPollAnswer();
         $poll->validateAnswer($pollAnswer, $this);
 
         $ap = AnswerPoll::createOrGetAnswerPoll($this->id, $pollId);

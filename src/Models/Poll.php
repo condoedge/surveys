@@ -86,6 +86,13 @@ class Poll extends ModelBaseForSurveys
         return 'poll_input_name_'.$this->id;
     }
 
+    public function getPollAnswer()
+    {
+        $ptc = $this->getPollTypeClass();
+
+        return $ptc::transformAnswer($this, request($this->getPollInputName()));
+    }
+
     public function getPollTypeClass()
     {
         return $this->getMainPoll()->type_po->pollTypeClass();

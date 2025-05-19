@@ -178,4 +178,9 @@ abstract class BasePollType
     {
         //OVERRIDE         
     }
+
+    public static function transformAnswer($poll, $value)
+    {
+        return $value;
+    }
 }
