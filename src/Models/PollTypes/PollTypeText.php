@@ -27,6 +27,6 @@ class PollTypeText extends BasePollType
 
     protected function getQuestionOptionsEls($poll)
     {
-        return;
+        return _HtmlField()->name('required_po')->value(0); //to force a 0 in required_po
     }
 }

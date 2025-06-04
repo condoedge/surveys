@@ -50,7 +50,7 @@ class Choice extends ModelBaseForSurveys
 	{
 		return '<div onclick="updateChoiceQuantityIfNeeded(this,'.$this->id.')">'.
 			'<div>'.$this->choice_content.'</div>'.
-			'<div class="text-sm text-info">'.$this->choice_amount.$this->choiceMaxQuantityLabel().'</div>'.
+			'<div class="text-sm text-info">'.currency($this->choice_amount).$this->choiceMaxQuantityLabel().'</div>'.
 		'</div>';
 	}
 

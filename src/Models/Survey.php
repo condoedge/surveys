@@ -62,7 +62,7 @@ class Survey extends ModelBaseForSurveys
 		return Choice::forPoll($this->polls()->pluck('id'))->whereNotNull('choice_amount')->count();
 	}
 
-	public function getOrderedPolls()
+	public function getOrderedPolls() //Only base Polls are linked to PollSections
 	{
 		return $this->pollSections()->with('polls')->get()->flatMap(fn($ps) => $ps->polls);
 	}
