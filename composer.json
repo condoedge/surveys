@@ -11,11 +11,7 @@
     "require": {
         "php": "^7.3|^8.0",
         "laravel/framework": ">=5.6.0",
-<<<<<<< HEAD
         "condoedge/utils": "^v0.2.12"
-=======
-        "condoedge/utils": "^v0.2.12"
->>>>>>> 0e9a3fc4d63d7d19d3eef8e6ccbbee170c14f936
     },
     "extra": {
         "laravel": {
