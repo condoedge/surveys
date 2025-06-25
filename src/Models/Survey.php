@@ -115,12 +115,26 @@ class Survey extends ModelBaseForSurveys
 		return $lastPollSection;
 	}
 
+	public function delete()
+	{
+		$this->pollSections->each->delete();
+
+		parent::delete();
+	}
+
 	/* ELEMENTS */
 	public function getSurveyOptionsFields()
 	{
 		return $this->surveyable->getSurveyOptionsFields(_Rows(
 			_Toggle()->name('one_page')->label('campaign.is-on-one-page')->default(1)->submit(),
 		), $this);
+	}
+
+	public function getSurveyTopButtons()
+	{
+		return [
+			_Button('campaign.visualize-form')->selfGet('visualizeAnswerSurveyModal')->inModal()->class('mb-4'),
+		];
 	}
 
 	public function getSurveyOptionsRules()

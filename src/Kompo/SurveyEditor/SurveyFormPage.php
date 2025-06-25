@@ -19,7 +19,7 @@ class SurveyFormPage extends Form
     {
         return _Rows(
             _FlexEnd4(
-                _Button('campaign.visualize-form')->selfGet('visualizeAnswerSurveyModal')->inModal()->class('mb-4'),
+                $this->model->getSurveyTopButtons(),
             ),
             _Columns(
                 _CardWhiteP4(
