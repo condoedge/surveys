@@ -16,6 +16,8 @@ enum PollTypeEnum: int
     case PO_TYPE_ACCEPTATION = 8;
     case PO_TYPE_RATING = 9;
 
+    case PO_TYPE_PERSON_INFO = 20; //special type combo
+
     public function pollTypeClass()
     {
         return match ($this)
@@ -29,6 +31,7 @@ enum PollTypeEnum: int
             static::PO_TYPE_BINARY => new \Condoedge\Surveys\Models\PollTypes\PollTypeBinary(),
             static::PO_TYPE_RATING => new \Condoedge\Surveys\Models\PollTypes\PollTypeRating(),
             static::PO_TYPE_ACCEPTATION => new \Condoedge\Surveys\Models\PollTypes\PollTypeAcceptation(),
+            static::PO_TYPE_PERSON_INFO => new \Condoedge\Surveys\Models\PollTypes\PollComboPersonInfo(),
         };
     }
 
@@ -45,6 +48,7 @@ enum PollTypeEnum: int
             static::PO_TYPE_BINARY => static::pollTypeLabel('campaign.binary-or-yes-no', 'like-dislike', 'campaign.binary-or-yes-no-sub1'),
             static::PO_TYPE_RATING => static::pollTypeLabel('campaign.rating', 'star-1', 'campaign.rating-sub1'),
             static::PO_TYPE_ACCEPTATION => static::pollTypeLabel('campaign.acceptation', 'tick-square', 'campaign.acceptation-sub1'),
+            static::PO_TYPE_PERSON_INFO => static::pollTypeLabel('surveys-personal-info', 'personalcard', 'surveys-personal-info-sub1'),
         };
     }
     
@@ -57,5 +61,17 @@ enum PollTypeEnum: int
                 _Html($description)->class('text-xs text-gray-600'),
             )
         )->class('border-b border-gray-200 py-2 px-2');
+    }
+
+    public static function getTypeClassFrom($type)
+    {
+        return PollTypeEnum::from($type)->pollTypeClass();
+    }
+
+    public static function isPollsCombo($type)
+    {
+        $pollTypeClass = PollTypeEnum::getTypeClassFrom($type);
+        
+        return $pollTypeClass::POLLTYPE_IS_COMBO;
     }
 }

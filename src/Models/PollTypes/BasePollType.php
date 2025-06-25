@@ -12,6 +12,7 @@ abstract class BasePollType
     public const POLL_IS_A_FIELD = true;
     public const POLL_HAS_OPEN_ANSWER = true;
     public const POLL_HAS_ARRAY_ANSWER = false;
+    public const POLLTYPE_IS_COMBO = false;
 
     public const DEFAULT_TRIGGER = 'onBlur';
 
@@ -182,5 +183,15 @@ abstract class BasePollType
     public static function transformAnswer($poll, $value)
     {
         return $value;
+    }
+
+    public static function initializePollForCombo($surveyId, $pollSectionId = null, $position = null)
+    {
+        $poll = new Poll();
+        $poll->survey_id = $surveyId;
+        $poll->poll_section_id = $pollSectionId ?: $poll->survey->createNextPollSection()->id;
+        $poll->position_po = $position ?: 0;
+
+        return $poll;
     }
 }
