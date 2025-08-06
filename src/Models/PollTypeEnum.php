@@ -48,7 +48,7 @@ enum PollTypeEnum: int
             static::PO_TYPE_BINARY => static::pollTypeLabel('campaign.binary-or-yes-no', 'like-dislike', 'campaign.binary-or-yes-no-sub1'),
             static::PO_TYPE_RATING => static::pollTypeLabel('campaign.rating', 'star-1', 'campaign.rating-sub1'),
             static::PO_TYPE_ACCEPTATION => static::pollTypeLabel('campaign.acceptation', 'tick-square', 'campaign.acceptation-sub1'),
-            static::PO_TYPE_PERSON_INFO => static::pollTypeLabel('surveys-personal-info', 'personalcard', 'surveys-personal-info-sub1'),
+            static::PO_TYPE_PERSON_INFO => static::pollTypeLabel('campaign.surveys-personal-info', 'personalcard', 'campaign.surveys-personal-info-sub1'),
         };
     }
     
