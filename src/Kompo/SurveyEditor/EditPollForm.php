@@ -93,6 +93,11 @@ class EditPollForm extends ModalScroll
         ];
     }
 
+    public function checkUrlsInText($text)
+    {
+        return $this->model->checkUrlsInTextEl($text);
+    }
+
     public function rules()
     {
     	return [

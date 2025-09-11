@@ -102,7 +102,13 @@ abstract class BasePollType
     protected function getQuestionInfoEls($poll)
     {
     	return _Rows(
-            _Input('campaign.question')->name('body_po')->class('mb-2'),
+            _Input('campaign.question')->name('body_po')->class('mb-2')
+                ->onChange->selfGet('checkUrlsInText')->inPanel('urls-check-results'),
+
+            _Panel(
+                $poll->checkUrlsInTextEl($poll->body_po)
+            )->id('urls-check-results')->class('mb-2'),
+            
             _Input('campaign.question-sub1')->name('explanation_po')->class('mb-2'),
         )->class('mb-6');
     }

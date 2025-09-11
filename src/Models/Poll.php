@@ -111,7 +111,15 @@ class Poll extends ModelBaseForSurveys
     public function getPollTitle()
     {
         $pollRequired = $this->required_po ? ('<span class="text-danger text-lg">*</span>') : '';
-        return $this->body_po . $pollRequired;
+
+        $title = $this->process_urls ? $this->processTitleUrls($this->body_po) : $this->body_po;
+
+        return $title . $pollRequired;
+    }
+
+    public function processTitleUrls($text)
+    {
+        return preg_replace('/https?:\/\/[^\s]+/i', '<a class="vlLink" href="$0" target="_blank">$0</a>', $text);
     }
 
     public function getPollRequiredPill()
@@ -297,6 +305,30 @@ class Poll extends ModelBaseForSurveys
     public function getPollableBox()
     {
         //OVERRIDE
+    }
+
+    public function checkUrlsInTextEl($text)
+    {
+        $hasUrls = $this->processTitleUrls($text) != $text;
+
+        if ($hasUrls) {
+            return _Card(
+                _Html('⚠️')->class('text-2xl mr-2 text-[#E69500]'),
+                _Rows(
+                    _Html('translate.campaign.urls-detected-in-question')->class('font-semibold mb-1 text-[#E69500]'),
+
+                    _Html('translate.you-can-enable-the-option-to-process-them-in-the-question-text-if-you-want-them-to-be-clickable-links')->class('text-sm'),
+
+                    _FlexEnd(
+                        _Toggle()->class('mt-4 !mb-0 [&>label>span]:!text-warning')
+                            ->name('process_urls')->value(1)
+                            ->dotColor('#fffad2ff')->checkColor('#FFC94D', '##CCCDD2'),
+                    ),
+                ),
+            )->class('flex-row p-4 border bg-[#FFF4D7] border-[#FFC94D] text-[#4B4B4B] mb-1 mt-2');
+        }
+
+        return null;
     }
 
 }

@@ -22,7 +22,7 @@ class PollTypeText extends BasePollType
     {
         $pollTextEditor = function_exists('_PollTextEditor') ? _PollTextEditor() : _CKEditor();
         
-    	return $pollTextEditor->name('body_po');
+    	return $pollTextEditor->name('body_po')->withoutHeight();
     }
 
     protected function getQuestionOptionsEls($poll)
