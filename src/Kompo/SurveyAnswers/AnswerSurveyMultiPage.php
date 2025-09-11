@@ -106,11 +106,11 @@ class AnswerSurveyMultiPage extends AnswerSurveyOnePage
 
     protected function getBackButton()
     {
-        return _Button('survey-back')->outlined()->selfGet('getBackActionPollAnswerForm')->inPanel(Survey::SURVEY_ANSWER_PANELID);
+        return _Button('surveys-back')->outlined()->selfGet('getBackActionPollAnswerForm')->inPanel(Survey::SURVEY_ANSWER_PANELID);
     }
 
     protected function getNextButton()
     {
-        return _SubmitButton('survey-next')->inPanel(Survey::SURVEY_ANSWER_PANELID);
+        return _SubmitButton('surveys-next')->inPanel(Survey::SURVEY_ANSWER_PANELID);
     }
 }

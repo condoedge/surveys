@@ -23,10 +23,27 @@ class AddPollForm extends Form
     {
         return _Cardwhite(
             PollTypeEnum::optionsWithLabels()->map(
-                fn($labelEls, $type) => _Rows($labelEls)->class('cursor-pointer')
-                    ->selfGet('addNewPoll', ['type' => $type])->inModal()
+                fn($labelEls, $type) => $this->getPollTypeCta($labelEls, $type)
             )
         );
+    }
+
+    protected function getPollTypeCta($labelEls, $type)
+    {
+        $els = _Rows($labelEls)->class('cursor-pointer');
+
+        return PollTypeEnum::isPollsCombo($type) ? 
+            $els->selfGet('createCombo', ['type' => $type])->redirect() : 
+            $els->selfGet('addNewPoll', ['type' => $type])->inModal();
+    }
+
+    public function createCombo($type) 
+    {
+        $pollTypeClass = PollTypeEnum::getTypeClassFrom($type);
+
+        $pollTypeClass::createPollsCombo($this->model->id, $this->pollSectionId, $this->positionPo);
+
+        return redirect($this->model->getEditSurveyRoute());
     }
 
     public function addNewPoll($type) 
