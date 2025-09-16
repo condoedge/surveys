@@ -36,6 +36,7 @@ class EditPollForm extends ModalScroll
     {
         $this->model->poll_section_id = $this->model->poll_section_id ?: $this->model->survey->createNextPollSection()->id;
         $this->model->position_po = $this->model->position_po ?: 0;
+        $this->model->process_urls = request('process_urls', false);
 
         $ps = $this->model->pollSection;
         if ($ps->isDoubleColumn() && ($ps->polls()->where('id', '<>', $this->model->id)->count() == 2)) {
