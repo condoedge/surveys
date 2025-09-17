@@ -107,7 +107,7 @@ abstract class BasePollType
                 ->onChange->selfGet('checkUrlsInText')->inPanel('urls-check-results'),
 
             _Panel(
-                $poll->checkUrlsInTextEl($poll->body_po)
+                $poll->checkUrlsInTextEl($poll->body_po) ?? _Hidden()->name('process_urls'),
             )->id('urls-check-results')->class('mb-2'),
             
             _Input('campaign.question-sub1')->name('explanation_po')->class('mb-2'),
