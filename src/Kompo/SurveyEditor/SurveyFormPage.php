@@ -3,20 +3,29 @@
 namespace Condoedge\Surveys\Kompo\SurveyEditor;
 
 use App\Models\Surveys\Survey;
-use Condoedge\Surveys\Models\Poll;
 use Condoedge\Utils\Kompo\Common\Form;
 
 class SurveyFormPage extends Form
 {
     public $model = Survey::class;
 
-    public function authorizeBoot()
+    // If we use authorizeBoot it breaks the whole container instead of not showing it or showing an user-friendly error
+    public function authorized()
     {
         return $this->model->id && auth()->user()->can('update', $this->model); //This form only accepts an already created survey object
     }
 
     public function render()
     {
+        if (!$this->authorized()) {
+            $komponent = GenericErrorView::boot([
+                'principal_message' => __('error.forbidden-title'),
+                'secondary_message' => __('error.forbidden-subtitle'),
+            ]);
+
+            return $komponent;
+        }
+
         return _Rows(
             _FlexEnd4(
                 $this->model->getSurveyTopButtons(),
