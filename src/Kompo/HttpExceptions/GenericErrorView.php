@@ -25,7 +25,7 @@ class GenericErrorView extends Form
             _Rows(
                 $this->errorComponent(),
             )->class('max-w-max bg-white rounded-xl overflow-hidden px-8'),
-        )->class('w-full h-full flex justify-center items-center');
+        )->class('w-full min-h-screen flex justify-start items-center');
     }
 
     protected function errorComponent()
