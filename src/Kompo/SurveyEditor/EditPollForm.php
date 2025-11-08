@@ -39,11 +39,14 @@ class EditPollForm extends ModalScroll
         $this->model->process_urls = request('process_urls', false);
 
         $ps = $this->model->pollSection;
+        if (!$ps) {
+            abort(403, __('survey-issue-refresh-try-again'));
+        }
         if ($ps->isDoubleColumn() && ($ps->polls()->where('id', '<>', $this->model->id)->count() == 2)) {
-            abort(403, __('Something is wrong, please refresh and try again.'));
+            abort(403, __('survey-issue-refresh-try-again'));
         }
         if (!$ps->isDoubleColumn() && ($ps->polls()->where('id', '<>', $this->model->id)->count() == 1)) {
-            abort(403, __('Something is wrong, please refresh and try again.'));
+            abort(403, __('survey-issue-refresh-try-again'));
         }
     }
 
