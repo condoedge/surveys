@@ -13,10 +13,5 @@ class PollTypeAcceptation extends BasePollType
         return _Checkbox('campaign.i-accept');
     }
 
-    public static function displayAnswer($answerPoll)
-    {
-        return $answerPoll->answer_text ? __('translate.accepted') : __('translate.not-accepted');
-    }
-
 	/* EDIT ELEMENTS */
 }
