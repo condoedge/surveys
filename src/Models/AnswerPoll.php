@@ -57,6 +57,12 @@ class AnswerPoll extends ModelBaseForSurveys
 
 	public function getAnswerDescriptionText()
 	{
+		$pollTypeClass = $this->poll?->getPollTypeClass();
+		
+		if ($pollTypeClass && method_exists($pollTypeClass, 'displayAnswer')) {
+			return $pollTypeClass::displayAnswer($this);
+		}
+
 		return $this->is_open_answer ? $this->answer_text : 
 			$this->getChoices()->map(fn($choice) => $choice->choice_content)->implode(', ');
 	}
