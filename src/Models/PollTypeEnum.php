@@ -15,6 +15,7 @@ enum PollTypeEnum: int
     case PO_TYPE_INPUT = 7;
     case PO_TYPE_ACCEPTATION = 8;
     case PO_TYPE_RATING = 9;
+    case PO_TYPE_FILE = 10;
 
     case PO_TYPE_PERSON_INFO = 20; //special type combo
 
@@ -32,6 +33,7 @@ enum PollTypeEnum: int
             static::PO_TYPE_RATING => new \Condoedge\Surveys\Models\PollTypes\PollTypeRating(),
             static::PO_TYPE_ACCEPTATION => new \Condoedge\Surveys\Models\PollTypes\PollTypeAcceptation(),
             static::PO_TYPE_PERSON_INFO => new \Condoedge\Surveys\Models\PollTypes\PollComboPersonInfo(),
+            static::PO_TYPE_FILE => new \Condoedge\Surveys\Models\PollTypes\PollTypeFile(),
         };
     }
 
@@ -49,6 +51,7 @@ enum PollTypeEnum: int
             static::PO_TYPE_RATING => static::pollTypeLabel('campaign.rating', 'star-1', 'campaign.rating-sub1'),
             static::PO_TYPE_ACCEPTATION => static::pollTypeLabel('campaign.acceptation', 'tick-square', 'campaign.acceptation-sub1'),
             static::PO_TYPE_PERSON_INFO => static::pollTypeLabel('campaign.surveys-personal-info', 'personalcard', 'campaign.surveys-personal-info-sub1'),
+            static::PO_TYPE_FILE => static::pollTypeLabel('translate.campaign.file-upload', 'document', 'translate.campaign.file-upload-sub1'),
         };
     }
     
