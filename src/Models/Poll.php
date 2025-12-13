@@ -315,9 +315,9 @@ class Poll extends ModelBaseForSurveys
             return _Card(
                 _Html('⚠️')->class('text-2xl mr-2 text-[#E69500]'),
                 _Rows(
-                    _Html('translate.campaign.urls-detected-in-question')->class('font-semibold mb-1 text-[#E69500]'),
+                    _Html('campaign.urls-detected-in-question')->class('font-semibold mb-1 text-[#E69500]'),
 
-                    _Html('translate.you-can-enable-the-option-to-process-them-in-the-question-text-if-you-want-them-to-be-clickable-links')->class('text-sm'),
+                    _Html('campaign.you-can-enable-the-option-to-process-them-in-the-question-text-if-you-want-them-to-be-clickable-links')->class('text-sm'),
 
                     _FlexEnd(
                         _Toggle()->class('mt-4 !mb-0 [&>label>span]:!text-warning')
