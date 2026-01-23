@@ -122,6 +122,11 @@ class Poll extends ModelBaseForSurveys
         return preg_replace('/https?:\/\/[^\s]+/i', '<a class="vlLink" href="$0" target="_blank">$0</a>', $text);
     }
 
+    public function isAnswerRequired()
+    {
+        return $this->required_po;
+    }
+
     public function getPollRequiredPill()
     {
         return !$this->required_po ? null : _Pill('campaign.answer-required');

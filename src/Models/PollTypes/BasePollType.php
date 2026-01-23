@@ -176,7 +176,7 @@ abstract class BasePollType
     {
         $mainPoll = $poll->getMainPoll();
 
-        if ($mainPoll->required_po && !$value) {
+        if ($mainPoll->isAnswerRequired() && !$value) {
             throwValidationError($poll->getPollInputName(), 'error.this-poll-is-required');
         }  
     }
