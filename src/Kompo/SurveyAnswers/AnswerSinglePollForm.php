@@ -14,6 +14,8 @@ class AnswerSinglePollForm extends Form
 
     public $model = Answer::class;
 
+    public $class = 'single-poll-answer-form';
+
     public function created() 
     {
         $this->pollId = $this->prop('poll_id');
