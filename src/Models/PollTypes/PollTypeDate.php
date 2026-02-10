@@ -4,10 +4,12 @@ namespace Condoedge\Surveys\Models\PollTypes;
 
 class PollTypeDate extends BasePollType
 {
+    public const DEFAULT_TRIGGER = 'onChange';
+
 	/* DISPLAY ELEMENTS */
 	protected function mainInputEl($poll)
     {
-        return _Date();
+        return _Date(); 
     }
 
 	/* EDIT ELEMENTS */
