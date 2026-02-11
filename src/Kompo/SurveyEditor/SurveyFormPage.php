@@ -3,7 +3,7 @@
 namespace Condoedge\Surveys\Kompo\SurveyEditor;
 
 use App\Models\Surveys\Survey;
-use Condoedge\Surveys\Kompo\HttpExceptions\GenericErrorView;
+use Condoedge\Utils\Kompo\HttpExceptions\GenericErrorView;
 use Condoedge\Utils\Kompo\Common\Form;
 
 class SurveyFormPage extends Form
