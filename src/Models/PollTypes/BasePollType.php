@@ -33,7 +33,7 @@ abstract class BasePollType
 
         if (static::POLL_IS_A_FIELD && ($displayMode != Poll::DISPLAY_MODE_EDITING)) {
             $inputEl = $inputEl->name($poll->getPollInputName(), false);
-
+dd($poll->getPollTitle());
             if ($answer) {//Set value
                 $ap = AnswerPoll::onlyGetAnswerPoll($answer->id, $poll->id);
                 $inputEl = $inputEl->value($ap?->getAnswerTextForFieldValue());
@@ -44,7 +44,9 @@ abstract class BasePollType
                 $defaultTrigger = static::DEFAULT_TRIGGER;
 
                 $inputEl = $inputEl->{$defaultTrigger}(
-                    fn($e) => $e->submit()->inPanel(Answer::SURVEY_COST_PANEL),
+                    fn($e) => $e->selfPost('saveInlinePollAnswer', [
+                        'poll_id' => $poll->id,
+                    ])->withAllFormValues()->inPanel(Answer::SURVEY_COST_PANEL),
                 );
 
                 foreach ($poll->getDependentConditions() as $condition) {
@@ -61,7 +63,7 @@ abstract class BasePollType
         }
 
         return _Panel(
-            !$poll->shouldDisplayPoll($answer, $displayMode) ? null : _Rows(
+            _Rows(
                 $this->titleExplanationEls($poll),
                 $inputEl,
             ),

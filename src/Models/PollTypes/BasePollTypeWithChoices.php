@@ -14,8 +14,10 @@ abstract class BasePollTypeWithChoices extends BasePollType
 
 	protected function mainInputEl($poll)
     {
+        $choices = $poll->relationLoaded('choices') ? $poll->choices : $poll->choices()->with('poll')->get();
+
         return $this->mainInputElWithoutOptions($poll)->options(
-        	$poll->choices()->with('poll')->get()->mapWithKeys(fn($choice) => [
+        	$choices->mapWithKeys(fn($choice) => [
                 $choice->id => _Html($choice->choiceLabelInHtml())->searchableBy($choice->choice_content),
             ])
         );
@@ -71,7 +73,7 @@ abstract class BasePollTypeWithChoices extends BasePollType
     {
         $mainPoll = $poll->getMainPoll();
         
-        if ($value && !$mainPoll->choices()->pluck('id')->contains($value)) {
+        if ($value && !$mainPoll->choices->pluck('id')->contains($value)) {
             throwValidationError($poll->getPollInputName(), 'error.pick-one-of-the-choices');
         }
 

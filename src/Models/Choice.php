@@ -13,11 +13,13 @@ class Choice extends ModelBaseForSurveys
 	/* CALCULATED FIELDS */
 	public function remainingQuantity($answer = null)
 	{
-		$initialQty = $this->choice_max_quantity;
+		return $this->memoize('remainingQty_' . ($answer?->id ?? 'null'), function () use ($answer) {
+			$initialQty = $this->choice_max_quantity;
 
-		$usedQty = $this->getUsageQueryForChoice()->forPoll($this->getUsagePollIds())->whereHas('answer', fn($q) => $q->lockedAnswer())->count();
+			$usedQty = $this->getUsageQueryForChoice()->forPoll($this->getUsagePollIds())->whereHas('answer', fn($q) => $q->lockedAnswer())->count();
 
-		return $initialQty - $usedQty - $this->getCurrentQuantity($answer);
+			return $initialQty - $usedQty - $this->getCurrentQuantity($answer);
+		});
 	}
 
 	public function getUsageQueryForChoice()

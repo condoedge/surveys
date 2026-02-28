@@ -17,6 +17,16 @@ class PollSection extends ModelBaseForSurveys
         return $this->hasMany(Poll::class)->orderPo();
     }
 
+    public function firstPoll()
+    {
+        return $this->hasOne(Poll::class)->orderPo();
+    }
+
+    public function lastPoll()
+    {
+        return $this->hasOne(Poll::class)->orderPo('DESC');
+    }
+
 	/* SCOPES */
     public function scopeOrderPs($query)
     {
@@ -26,12 +36,12 @@ class PollSection extends ModelBaseForSurveys
 	/* CALCULATED FIELDS */
     public function getFirstPoll()
     {
-        return $this->polls()->isPositionFirst()->first();
+        return $this->relationLoaded('polls') ? $this->polls->first() : $this->firstPoll;
     }
 
     public function getLastPoll()
     {
-        return $this->polls()->isPositionLast()->first();
+        return $this->relationLoaded('polls') ? $this->polls->last() : $this->lastPoll;
     }
 
     public function isDoubleColumn()
