@@ -186,19 +186,20 @@ class Poll extends ModelBaseForSurveys
         return $this->getTheCondition();
     }
 
-    protected static $preloadedDependentConditions = null;
-
     public static function preloadDependentConditions($pollIds)
     {
-        static::$preloadedDependentConditions = Condition::whereIn('condition_poll_id', $pollIds)
+        return static::classMemoize('preloadedDependentConditions', fn() => Condition::whereIn('condition_poll_id', $pollIds)
             ->get()
-            ->groupBy('condition_poll_id');
+            ->groupBy('condition_poll_id')
+        );
     }
 
     public function getDependentConditions()
     {
-        if (static::$preloadedDependentConditions !== null) {
-            return static::$preloadedDependentConditions->get($this->id) ?? collect();
+        $preloaded = static::$_memoizedStatic[static::class . ':class:preloadedDependentConditions'] ?? null;
+        
+        if ($preloaded !== null) {
+            return $preloaded->get($this->id) ?? collect();
         }
 
         return $this->memoize('dependentConditions', fn() => Condition::where('condition_poll_id', $this->id)->get());
