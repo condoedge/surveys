@@ -33,7 +33,7 @@ abstract class BasePollType
 
         if (static::POLL_IS_A_FIELD && ($displayMode != Poll::DISPLAY_MODE_EDITING)) {
             $inputEl = $inputEl->name($poll->getPollInputName(), false);
-dd($poll->getPollTitle());
+
             if ($answer) {//Set value
                 $ap = AnswerPoll::onlyGetAnswerPoll($answer->id, $poll->id);
                 $inputEl = $inputEl->value($ap?->getAnswerTextForFieldValue());

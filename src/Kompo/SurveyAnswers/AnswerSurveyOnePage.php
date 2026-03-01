@@ -64,6 +64,10 @@ class AnswerSurveyOnePage extends Form
                 $this->pollSectionsRendered,
             ),
             $this->model->getTotalAnswerCostPanel(),
+            _Columns(
+                $this->getBackButton()->class('w-full mb-4 excludeAutoColor'),
+                $this->getNextButton()->class('w-full mb-4'),
+            ),
         )->class('pt-6 px-2');
     }
 
