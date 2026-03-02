@@ -8,12 +8,18 @@ use Condoedge\Utils\Kompo\Common\Form;
 
 class AnswerSurveyOnePage extends Form
 {
+    use HandlesInlinePollSaving;
+
     protected $survey;
     protected $answerable;
 
+    protected $pollSectionsRendered = null;
+    protected $cachedPollSections = null;
+    protected $isActionContext = false;
+
     public $model = Answer::class;
 
-    public function created() 
+    public function created()
     {
         if (!$this->model->id) {
             $answerPayload = [];
@@ -23,24 +29,44 @@ class AnswerSurveyOnePage extends Form
 
             $this->model(Answer::createOrGetAnswerFromKompoClass($answerPayload));
         }
+    }
 
+    public function createdAction()
+    {
+        $this->isActionContext = true;
+    }
+
+    public function createdDisplay()
+    {
         $this->survey = $this->model->survey;
         $this->answerable = $this->model->answerable;
     }
 
-    public function render() 
+    protected function getPollSections()
     {
+        return $this->cachedPollSections ??= PollSection::where('survey_id', $this->survey->id)->orderPs()
+            ->with('polls.choices', 'polls.condition', 'polls.pollProducts')
+            ->get();
+    }
+
+    public function render()
+    {
+        if ($this->isActionContext) {
+            return _Rows();
+        }
+
+        $this->pollSectionsRendered ??= $this->getPollSections()
+            ->map(fn($ps) => $this->renderPollSection($ps));
+
         return _Rows(
             $this->model->getAnswererNameEls(),
-            _Div(
-                PollSection::where('survey_id', $this->survey->id)->orderPs()->get()->map(
-                    fn($ps) => $this->renderPollSection($ps)
-                )
+            _Rows(
+                $this->pollSectionsRendered,
             ),
             $this->model->getTotalAnswerCostPanel(),
             _Columns(
-                $this->getBackButton(),
-                $this->getNextButton(),
+                $this->getBackButton()->class('w-full mb-4 excludeAutoColor'),
+                $this->getNextButton()->class('w-full mb-4'),
             ),
         )->class('pt-6 px-2');
     }
@@ -51,7 +77,7 @@ class AnswerSurveyOnePage extends Form
 
         $content = $this->displayPollInOnePageSurvey($firstPoll);
 
-        if($pollSection->isDoubleColumn()) {
+        if ($pollSection->isDoubleColumn()) {
             $lastPoll = $pollSection->getLastPoll();
             $content = _Columns(
                 $content,
@@ -64,7 +90,11 @@ class AnswerSurveyOnePage extends Form
 
     protected function displayPollInOnePageSurvey($poll)
     {
-        return new AnswerSinglePollForm($this->model->id, ['poll_id' => $poll?->id]);
+        if (!$poll) {
+            return null;
+        }
+
+        return $poll->getDisplayInputEls($this->model);
     }
 
     protected function getBackButton()

@@ -59,12 +59,18 @@ class Survey extends ModelBaseForSurveys
 	/* CALCULATED FIELDS */
 	public function hasChoicesWithAmounts()
 	{
-		return Choice::forPoll($this->polls()->pluck('id'))->whereNotNull('choice_amount')->count();
+		return $this->memoize('hasChoicesWithAmounts', fn() =>
+			$this->getOrderedPolls()->contains(fn($poll) =>
+				$poll->choices->contains(fn($c) => $c->choice_amount !== null)
+			)
+		);
 	}
 
 	public function getOrderedPolls() //Only base Polls are linked to PollSections
 	{
-		return $this->pollSections()->with('polls')->get()->flatMap(fn($ps) => $ps->polls);
+		return $this->memoize('orderedPolls', fn() =>
+			$this->pollSections()->with(['polls.choices', 'polls.condition', 'polls.pollProducts'])->get()->flatMap(fn($ps) => $ps->polls)
+		);
 	}
 
 	public function getVisibleOrderedPollsForAnswer($answer)

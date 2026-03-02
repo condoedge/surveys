@@ -47,7 +47,9 @@ class AnswerPoll extends ModelBaseForSurveys
 
 	public function getChoices()
 	{
-		return Choice::whereIn('id', $this->getChoiceIdsAsArray())->get();
+		return $this->memoize('choices', fn() =>
+			Choice::whereIn('id', $this->getChoiceIdsAsArray())->get()
+		);
 	}
 
 	public function getChoicesCost()

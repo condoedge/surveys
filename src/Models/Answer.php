@@ -27,8 +27,16 @@ class Answer extends ModelBaseForSurveys
 	/* CALCULATED FIELDS */    
 	public function getTotalAnswerCost()
     {
-        return AnswerPoll::where('answer_id', $this->id)->with('poll')->get()
-        	->sum(fn($ap) => $ap->poll->shouldDisplayPoll($this) ? $ap->getChoicesCost() : 0);
+        return $this->memoize('totalAnswerCost', function () {
+            if (method_exists(AnswerPoll::class, 'preloadedForAnswer')) {
+                $answerPolls = AnswerPoll::preloadedForAnswer($this->id)
+                    ?? AnswerPoll::where('answer_id', $this->id)->with('poll')->get();
+            } else {
+                $answerPolls = AnswerPoll::where('answer_id', $this->id)->with('poll')->get();
+            }
+
+            return $answerPolls->sum(fn($ap) => $ap->poll?->shouldDisplayPoll($this) ? $ap->getChoicesCost() : 0);
+        });
     }
 
     public static function answerPayloadColumns()

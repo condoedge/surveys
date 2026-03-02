@@ -95,7 +95,7 @@ class Poll extends ModelBaseForSurveys
 
     public function getPollTypeClass()
     {
-        return $this->getMainPoll()->type_po->pollTypeClass();
+        return $this->memoize('pollTypeClass', fn() => $this->getMainPoll()->type_po->pollTypeClass());
     }
 
     public function isSubPoll()
@@ -105,7 +105,7 @@ class Poll extends ModelBaseForSurveys
 
     public function getMainPoll()
     {
-        return $this->isSubPoll() ? $this->parentPoll : $this;
+        return $this->memoize('mainPoll', fn() => $this->isSubPoll() ? $this->parentPoll : $this);
     }
 
     public function getPollTitle()
@@ -157,22 +157,28 @@ class Poll extends ModelBaseForSurveys
 
     public function hasChoicesAmounts()
     {
-        return $this->choices()->whereNotNull('choice_amount')->count();
+        return $this->relationLoaded('choices')
+            ? $this->choices->contains(fn($c) => $c->choice_amount !== null)
+            : $this->choices()->whereNotNull('choice_amount')->count();
     }
 
     public function hasChoicesQuantities()
     {
-        return $this->choices()->whereNotNull('choice_max_quantity')->count();
+        return $this->relationLoaded('choices')
+            ? $this->choices->contains(fn($c) => $c->choice_max_quantity !== null)
+            : $this->choices()->whereNotNull('choice_max_quantity')->count();
     }
 
     public function hasChoices()
     {
-        return $this->choices()->count();
+        return $this->relationLoaded('choices')
+            ? $this->choices->isNotEmpty()
+            : $this->choices()->count();
     }
 
     public function getTheCondition()
     {
-        return $this->condition()->first();
+        return $this->relationLoaded('condition') ? $this->condition : $this->memoize('theCondition', fn() => $this->condition()->first());
     }
 
     public function hasConditions()
@@ -180,16 +186,34 @@ class Poll extends ModelBaseForSurveys
         return $this->getTheCondition();
     }
 
+    public static function preloadDependentConditions($pollIds)
+    {
+        return static::classMemoize('preloadedDependentConditions', fn() => Condition::whereIn('condition_poll_id', $pollIds)
+            ->get()
+            ->groupBy('condition_poll_id')
+        );
+    }
+
     public function getDependentConditions()
     {
-        return Condition::where('condition_poll_id', $this->id)->get();
+        $preloaded = static::$_memoizedStatic[static::class . ':class:preloadedDependentConditions'] ?? null;
+        
+        if ($preloaded !== null) {
+            return $preloaded->get($this->id) ?? collect();
+        }
+
+        return $this->memoize('dependentConditions', fn() => Condition::where('condition_poll_id', $this->id)->get());
     }
 
     public function getPreviousPollsWithChoices()
     {
+        $pollSectionOrder = $this->relationLoaded('pollSection')
+            ? $this->pollSection?->order
+            : $this->pollSection()->value('order');
+
         return $this->survey->pollSections()
-            ->when($this->pollSection()->first()?->order,  //If null, we are appending a new pollSection
-                fn($q) => $q->where('order', '<=', $this->pollSection()->first()?->order)
+            ->when($pollSectionOrder,  //If null, we are appending a new pollSection
+                fn($q) => $q->where('order', '<=', $pollSectionOrder)
             )
             ->with('polls')->get()
             ->flatMap->polls
@@ -200,20 +224,24 @@ class Poll extends ModelBaseForSurveys
 
     public function shouldDisplayPoll($answer = null, $displayMode = null)
     {
-        if ($displayMode && ($displayMode != Poll::DISPLAY_MODE_INITIAL)) {
-            return true;
-        }
+        $key = 'shouldDisplay_' . ($answer?->id ?? 'null') . '_' . ($displayMode ?? 'null');
 
-        if ($answer && ($condition = $this->getTheCondition())) {
-            $ap = AnswerPoll::onlyGetAnswerPoll($answer->id, $condition->condition_poll_id);
-            if ($condition->isFulfilled($ap?->getChoiceIdsAsArray())) {
+        return $this->memoize($key, function () use ($answer, $displayMode) {
+            if ($displayMode && ($displayMode != Poll::DISPLAY_MODE_INITIAL)) {
                 return true;
-            } else {
-                return false;
             }
-        }
 
-        return true;
+            if ($answer && ($condition = $this->getTheCondition())) {
+                $ap = AnswerPoll::onlyGetAnswerPoll($answer->id, $condition->condition_poll_id);
+                if ($condition->isFulfilled($ap?->getChoiceIdsAsArray())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            return true;
+        });
     }
 
     public function deletable()
