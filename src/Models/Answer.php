@@ -28,8 +28,12 @@ class Answer extends ModelBaseForSurveys
 	public function getTotalAnswerCost()
     {
         return $this->memoize('totalAnswerCost', function () {
-            $answerPolls = AnswerPoll::preloadedForAnswer($this->id)
-                ?? AnswerPoll::where('answer_id', $this->id)->with('poll')->get();
+            if (method_exists(AnswerPoll::class, 'preloadedForAnswer')) {
+                $answerPolls = AnswerPoll::preloadedForAnswer($this->id)
+                    ?? AnswerPoll::where('answer_id', $this->id)->with('poll')->get();
+            } else {
+                $answerPolls = AnswerPoll::where('answer_id', $this->id)->with('poll')->get();
+            }
 
             return $answerPolls->sum(fn($ap) => $ap->poll?->shouldDisplayPoll($this) ? $ap->getChoicesCost() : 0);
         });
