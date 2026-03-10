@@ -29,17 +29,14 @@ class AnswerSurveyOnePage extends Form
 
             $this->model(Answer::createOrGetAnswerFromKompoClass($answerPayload));
         }
+
+        $this->survey = $this->model->survey;
+        $this->answerable = $this->model->answerable;
     }
 
     public function createdAction()
     {
         $this->isActionContext = true;
-    }
-
-    public function createdDisplay()
-    {
-        $this->survey = $this->model->survey;
-        $this->answerable = $this->model->answerable;
     }
 
     protected function getPollSections()
