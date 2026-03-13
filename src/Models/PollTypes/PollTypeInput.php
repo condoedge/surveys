@@ -20,7 +20,7 @@ class PollTypeInput extends BasePollType
             self::TEXT_EMAIL => _Input()->type('email'),
             self::TEXT_ADDRESS => _Place()->defaultCenter(45.5017, -73.5673)->noDefaultUi()->componentRestrictions([
                 'country' => ['ca']
-            ]),
+            ])->class('place-input-without-visual'),
             default => _Input(),
         };
 
