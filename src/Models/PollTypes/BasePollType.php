@@ -29,10 +29,20 @@ abstract class BasePollType
     {
         $mainPoll = $poll->getMainPoll();
 
+        $pollPanelId = 'poll-wrapper-'.$poll->id;
+        $isConditionalDisplay = $displayMode == Poll::DISPLAY_MODE_INITIAL && $mainPoll->getTheCondition();
+
+        if ($isConditionalDisplay) {
+            return _Panel(
+
+            )->id($pollPanelId);
+        }
+
         $inputEl = $this->mainInputEl($mainPoll);
 
         if (static::POLL_IS_A_FIELD && ($displayMode != Poll::DISPLAY_MODE_EDITING)) {
-            $inputEl = $inputEl->name($poll->getPollInputName(), false);
+            $inputEl = $inputEl->name($poll->getPollInputName(), false)
+                ->id($poll->getPollInputName().'-'.uniqid()); //added to avoid an unsolved bug in new setStableIdForElement
 
             if ($answer) {//Set value
                 $ap = AnswerPoll::onlyGetAnswerPoll($answer->id, $poll->id);
@@ -62,12 +72,18 @@ abstract class BasePollType
             }
         }
 
+        $els = _Rows(
+            $this->titleExplanationEls($poll),
+            $inputEl,
+        );
+
+        if ($isConditionalDisplay) {
+            return $els;
+        }
+
         return _Panel(
-            _Rows(
-                $this->titleExplanationEls($poll),
-                $inputEl,
-            ),
-        )->id('poll-wrapper-'.$poll->id);
+           $els
+        )->id($pollPanelId);
     }
 
     protected function mainInputEl($poll)

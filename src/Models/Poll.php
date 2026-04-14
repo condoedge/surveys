@@ -196,13 +196,7 @@ class Poll extends ModelBaseForSurveys
 
     public function getDependentConditions()
     {
-        $preloaded = static::$_memoizedStatic[static::class . ':class:preloadedDependentConditions'] ?? null;
-        
-        if ($preloaded !== null) {
-            return $preloaded->get($this->id) ?? collect();
-        }
-
-        return $this->memoize('dependentConditions', fn() => Condition::where('condition_poll_id', $this->id)->get());
+        return Condition::where('condition_poll_id', $this->id)->get();
     }
 
     public function getPreviousPollsWithChoices()
