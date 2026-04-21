@@ -136,7 +136,7 @@ abstract class BasePollType
     {
         return _Rows(
             _Toggle('campaign.answer-required')->name('required_po')->class('mb-2'),
-            _Toggle('translate.hide-question')->name('hide_poll')->class('mb-2'),
+            _Toggle('campaign.hide-question')->name('hide_poll')->class('mb-2'),
             !$poll->survey->hasAskQuestionOnce() ? null : _Toggle('campaign.ask-question-once')->name('ask_question_once')->class('mb-2'),
         );
     }
