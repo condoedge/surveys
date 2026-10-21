@@ -53,10 +53,10 @@ abstract class BasePollType
             }
 
             if (!$multiPage && $eligibility) {
-                // The path refresh saves the answer itself: a second save at once could race
+                // The path refresh saves the answer and is the confirmation: a toast would cover the button below
                 $inputEl = $inputEl->onChange(
                     fn($e) => $e->selfPost('refreshSurveyPath', ['poll_id' => $poll->id])->withAllFormValues()->inPanel(Survey::PATH_PANEL)
-                )->alert('survey.answer-saved');
+                );
             } elseif (!$multiPage) {
 
                 $defaultTrigger = static::DEFAULT_TRIGGER;
@@ -75,8 +75,8 @@ abstract class BasePollType
                     );
                 }
 
-                // The path re-rendering is the confirmation; a toast would cover the button below
-                $inputEl = $branching ? $inputEl : $inputEl->alert('survey.answer-saved');
+                //Last optional Action
+                $inputEl = $inputEl->alert('survey.answer-saved');
             }
         }
 
@@ -160,14 +160,6 @@ abstract class BasePollType
 
     protected function getConditionsBox($poll)
     {
-        // Arrows and display conditions don't mix: once a form has arrows, they decide what shows
-        if ($poll->survey?->usesBranching()) {
-            return _Rows(
-                _Html('surveys-conditions-replaced')->class('text-sm text-gray-600 mb-2'),
-                _Hidden()->name('has_conditions', false)->value(0), // the save reads it to drop any old condition
-            );
-        }
-
         $condition = $poll->getTheCondition();
 
         return _Div(
