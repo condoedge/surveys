@@ -9,6 +9,9 @@ use App\Models\Teams\Team;
 
 class Survey extends ModelBaseForSurveys
 {
+	use \Kompo\Database\HasTranslations;
+	protected $translatable = ['end_yes_message', 'end_no_message', 'end_warn_message', 'end_contact'];
+
 	public const SURVEY_ANSWER_PANELID = 'SURVEY_ANSWER_PANELID';
 	public const PATH_PANEL = 'survey-path-panel';
 
@@ -223,8 +226,8 @@ class Survey extends ModelBaseForSurveys
 		return _Rows(
 			_Html(__('surveys-result-'.$end))->class('font-semibold'),
 			_Html(e($this->endMessage($end, $ownMessage))),
-			$end != static::END_WARN || !$this->end_contact ? null : _Html(e($this->end_contact))->class('font-medium'),
-		)->class('rounded-2xl p-4 gap-1 my-4 '.$colors[$end]);
+			$end != static::END_WARN || !$this->end_contact ? null : _Html(e($this->end_contact))->class('font-medium break-words'),
+		)->class('rounded-2xl p-4 gap-1 my-4 break-words '.$colors[$end]);
 	}
 
 	/** What the arrows leave broken: a question no answer leads to, or no way to reach "eligible". */

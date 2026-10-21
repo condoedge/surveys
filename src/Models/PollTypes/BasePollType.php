@@ -77,8 +77,8 @@ abstract class BasePollType
                     );
                 }
 
-                //Last optional Action
-                $inputEl = $inputEl->alert('survey.answer-saved');
+                // The path re-rendering is the confirmation; a toast would cover the button below
+                $inputEl = $branching ? $inputEl : $inputEl->alert('survey.answer-saved');
             }
         }
 
@@ -166,7 +166,10 @@ abstract class BasePollType
     {
         // Arrows and display conditions don't mix: once a form has arrows, they decide what shows
         if ($poll->survey?->usesBranching()) {
-            return _Html('surveys-conditions-replaced')->class('text-sm text-gray-600 mb-2');
+            return _Rows(
+                _Html('surveys-conditions-replaced')->class('text-sm text-gray-600 mb-2'),
+                _Hidden()->name('has_conditions', false)->value(0), // the save reads it to drop any old condition
+            );
         }
 
         $condition = $poll->getTheCondition();
