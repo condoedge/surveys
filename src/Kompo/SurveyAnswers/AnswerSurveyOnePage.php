@@ -56,14 +56,14 @@ class AnswerSurveyOnePage extends Form
         $this->pollSectionsRendered ??= $this->getPollSections()
             ->map(fn($ps) => $this->renderPollSection($ps));
 
-        $branching = $this->survey->usesBranching();
+        $eligibility = $this->survey->managesEligibility();
 
         return _Rows(
             $this->model->getAnswererNameEls(),
-            $branching ? _Panel($this->pathEls($this->pollSectionsRendered))->id(Survey::PATH_PANEL) : _Rows(
+            $eligibility ? _Panel($this->pathEls($this->pollSectionsRendered))->id(Survey::PATH_PANEL) : _Rows(
                 $this->pollSectionsRendered,
             ),
-            $branching ? null : $this->model->getTotalAnswerCostPanel(),
+            $eligibility ? null : $this->model->getTotalAnswerCostPanel(),
             _Columns(
                 $this->getBackButton()->class('w-full mb-4 excludeAutoColor'),
                 $this->getNextButton()->class('w-full mb-4'),
@@ -102,7 +102,7 @@ class AnswerSurveyOnePage extends Form
 
     protected function displayPollInOnePageSurvey($poll)
     {
-        if (!$poll || ($this->survey->usesBranching() && !$poll->shouldDisplayPoll($this->model))) {
+        if (!$poll || ($this->survey->managesEligibility() && !$poll->shouldDisplayPoll($this->model))) {
             return null;
         }
 

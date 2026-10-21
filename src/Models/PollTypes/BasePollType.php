@@ -31,9 +31,9 @@ abstract class BasePollType
         $mainPoll = $poll->getMainPoll();
 
         $pollPanelId = 'poll-wrapper-'.$poll->id;
-        $branching = (bool) $mainPoll->survey?->usesBranching();
+        $eligibility = $mainPoll->survey?->managesEligibility();
         // With arrows, the whole path re-renders after each answer: no condition panel waits empty
-        $isConditionalDisplay = !$branching && $displayMode == Poll::DISPLAY_MODE_INITIAL && $mainPoll->getTheCondition();
+        $isConditionalDisplay = !$eligibility && $displayMode == Poll::DISPLAY_MODE_INITIAL && $mainPoll->getTheCondition();
 
         if ($isConditionalDisplay) {
             return _Panel(
@@ -52,24 +52,22 @@ abstract class BasePollType
                 $inputEl = $inputEl->value($ap?->getAnswerTextForFieldValue());
             }
 
-            if (!$multiPage) {
+            if (!$multiPage && $eligibility) {
+                // The path refresh saves the answer itself: a second save at once could race
+                $inputEl = $inputEl->onChange(
+                    fn($e) => $e->selfPost('refreshSurveyPath', ['poll_id' => $poll->id])->withAllFormValues()->inPanel(Survey::PATH_PANEL)
+                )->alert('survey.answer-saved');
+            } elseif (!$multiPage) {
 
-                // With arrows, the path refresh saves the answer itself: two saves at once could race
                 $defaultTrigger = static::DEFAULT_TRIGGER;
 
-                $inputEl = $branching ? $inputEl : $inputEl->{$defaultTrigger}(
+                $inputEl = $inputEl->{$defaultTrigger}(
                     fn($e) => $e->selfPost('saveInlinePollAnswer', [
                         'poll_id' => $poll->id,
                     ])->withAllFormValues()->inPanel(Answer::SURVEY_COST_PANEL),
                 );
 
-                if ($branching) {
-                    $inputEl = $inputEl->onChange(
-                        fn($e) => $e->selfPost('refreshSurveyPath', ['poll_id' => $poll->id])->withAllFormValues()->inPanel(Survey::PATH_PANEL)
-                    );
-                }
-
-                foreach ($branching ? [] : $poll->getDependentConditions() as $condition) {
+                foreach ($poll->getDependentConditions() as $condition) {
                     $inputEl = $inputEl->onChange(
                         fn($e) => $e->selfPost('manageDisplayForCondition', [
                             'condition_id' => $condition->id,
@@ -123,8 +121,7 @@ abstract class BasePollType
             $this->getQuestionInfoEls($poll),
             $this->getQuestionOptionsEls($poll),
             $poll->getPollableBox(),
-            $this->getNextDefaultBox($poll),
-            $this->getConditionsBox($poll),
+            $poll->survey->managesEligibility() ? $this->getNextDefaultBox($poll) : $this->getConditionsBox($poll),
             $this->getChoicesInfoEls($poll),
         );
     }
@@ -152,8 +149,7 @@ abstract class BasePollType
         );
     }
 
-
-    /** Where to go after this question: for every answer, or for the answers without their own arrow. */
+    /** In a survey that manages eligibility, in place of the display condition: where to go after this question. */
     protected function getNextDefaultBox($poll)
     {
         return _Select($poll->branchesPerChoice() ? 'surveys-other-answers' : 'surveys-after-this-question')
@@ -164,11 +160,6 @@ abstract class BasePollType
 
     protected function getConditionsBox($poll)
     {
-        // Arrows and display conditions don't mix: once a form has arrows, they decide what shows
-        if ($poll->survey?->usesBranching()) {
-            return _Html('surveys-conditions-replaced')->class('text-sm text-gray-600 mb-2');
-        }
-
         $condition = $poll->getTheCondition();
 
         return _Div(

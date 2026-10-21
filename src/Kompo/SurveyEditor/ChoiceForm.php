@@ -20,8 +20,8 @@ class ChoiceForm extends Form
     {
         $this->withAmounts = $this->prop('with_amounts');
         $this->withQuantities = $this->prop('with_quantities');
-        $poll = Poll::find($this->prop('poll_id')) ?: new Poll(['survey_id' => $this->prop('survey_id'), 'type_po' => $this->prop('type_po')]);
-        $this->targets = $poll->survey && $poll->branchesPerChoice() ? $poll->nextTargetOptions() : null;
+        $poll = Poll::find($this->prop('poll_id')) ?: $this->newDefaultPoll();
+        $this->targets = $poll->survey?->managesEligibility() && $poll->branchesPerChoice() ? $poll->nextTargetOptions() : null;
 
         $this->canDelete = !in_array($this->prop('type_po'), [
             PollTypeEnum::PO_TYPE_BINARY,
@@ -50,6 +50,15 @@ class ChoiceForm extends Form
             _Link()->icon(_Sax('trash', 16)->class('text-gray-500 ml-1'))->selfDelete('deleteChoice', ['id' => $this->model->id])->emitDirect('deleted') :
 
             _Link()->icon(_Sax('trash', 16)->class('text-gray-500 ml-1'))->emitDirect('deleted');
+    }
+
+    protected function newDefaultPoll()
+    {
+        $poll = new Poll;
+        $poll->survey_id = $this->prop('survey_id');
+        $poll->poll_section_id = $this->prop('poll_section_id');
+        $poll->type_po = $this->prop('type_po');
+        return $poll;
     }
 
     public function rules()

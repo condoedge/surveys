@@ -6,22 +6,27 @@ use App\Models\Surveys\Survey;
 use Condoedge\Utils\Kompo\Common\Form;
 
 /**
- * Left of the builder, under the options: the form's ends and their messages, what the arrows leave unreachable,
- * and the plan of every path. Before the first arrow, a line saying how to start.
+ * Left of the builder, under the options: the banner that turns on "this survey manages eligibility".
+ * Turned on, the form's ends and their messages, what the arrows leave unreachable, and the plan of every path.
  */
-class SurveyBranchingCard extends Form
+class SurveyEligibilityCard extends Form
 {
     public $model = Survey::class;
 
     public function render()
     {
-        if (!$this->model->usesBranching()) {
-            return _Rows(
-                _Html('surveys-form-ends')->class('text-lg font-bold'),
-                _Html('surveys-branching-intro')->class('text-sm text-gray-600'),
-            )->class('mt-6 gap-1');
-        }
+        return _Rows(
+            _Rows(
+                _Toggle('surveys-manages-eligibility')->name('manages_eligibility')
+                    ->submit()->run('() => { window.location.reload() }'),
+                _Html('surveys-manages-eligibility-hint')->class('text-sm text-gray-600'),
+            )->class('bg-info bg-opacity-10 rounded-2xl p-4 gap-1'),
+            !$this->model->managesEligibility() ? null : $this->endsEls(),
+        )->class('mt-6 gap-4');
+    }
 
+    protected function endsEls()
+    {
         $issues = $this->model->branchingIssues();
 
         return _Rows(
@@ -38,7 +43,7 @@ class SurveyBranchingCard extends Form
             _Html('surveys-checks')->class('font-semibold mt-4'),
             !$issues ? _Html('surveys-checks-ok')->class('text-sm text-positive')
                 : _Rows(collect($issues)->map(fn($issue) => _Html(e($issue))->class('text-sm text-danger'))->all())->class('gap-1'),
-        )->class('mt-6 gap-2');
+        )->class('gap-2');
     }
 
     public function getPlanEls()
