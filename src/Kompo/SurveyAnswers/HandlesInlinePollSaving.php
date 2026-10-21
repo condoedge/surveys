@@ -16,6 +16,15 @@ trait HandlesInlinePollSaving
         return $this->model->getTotalAnswerCostEls();
     }
 
+    /** A form with arrows: save the answer, then show the path it now leads to. */
+    public function refreshSurveyPath()
+    {
+        $this->model->saveAnswerToSinglePoll(request('poll_id'));
+        \App\Models\Surveys\Survey::forgetAnswerReads();
+
+        return $this->pathEls();
+    }
+
     public function manageDisplayForCondition()
     {
         $condition = Condition::findOrFail(request('condition_id'));

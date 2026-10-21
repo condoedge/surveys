@@ -4,6 +4,7 @@ namespace Condoedge\Surveys\Kompo\SurveyAnswers;
 
 use App\Models\Surveys\Answer;
 use App\Models\Surveys\PollSection;
+use App\Models\Surveys\Survey;
 use Condoedge\Utils\Kompo\Common\Form;
 
 class AnswerSurveyOnePage extends Form
@@ -55,12 +56,14 @@ class AnswerSurveyOnePage extends Form
         $this->pollSectionsRendered ??= $this->getPollSections()
             ->map(fn($ps) => $this->renderPollSection($ps));
 
+        $branching = $this->survey->usesBranching();
+
         return _Rows(
             $this->model->getAnswererNameEls(),
-            _Rows(
+            $branching ? _Panel($this->pathEls($this->pollSectionsRendered))->id(Survey::PATH_PANEL) : _Rows(
                 $this->pollSectionsRendered,
             ),
-            $this->model->getTotalAnswerCostPanel(),
+            $branching ? null : $this->model->getTotalAnswerCostPanel(),
             _Columns(
                 $this->getBackButton()->class('w-full mb-4 excludeAutoColor'),
                 $this->getNextButton()->class('w-full mb-4'),
@@ -85,9 +88,21 @@ class AnswerSurveyOnePage extends Form
         return $content;
     }
 
+    /** A form with arrows: the questions on the person's path, where it ends, and the cost, re-rendered after each answer. */
+    protected function pathEls($renderedSections = null)
+    {
+        $walk = $this->survey->walk($this->model);
+
+        return _Rows(
+            _Rows($renderedSections ?? $this->getPollSections()->map(fn($ps) => $this->renderPollSection($ps))),
+            !$walk['end'] ? null : $this->survey->endCardEls($walk['end'], $walk['message']),
+            $this->model->getTotalAnswerCostPanel(),
+        );
+    }
+
     protected function displayPollInOnePageSurvey($poll)
     {
-        if (!$poll) {
+        if (!$poll || ($this->survey->usesBranching() && !$poll->shouldDisplayPoll($this->model))) {
             return null;
         }
 

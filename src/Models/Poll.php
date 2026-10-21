@@ -176,6 +176,47 @@ class Poll extends ModelBaseForSurveys
             : $this->choices()->count();
     }
 
+    /** One arrow per answer for the single-answer types; the others have one arrow, after the question. */
+    public function branchesPerChoice()
+    {
+        return in_array($this->type_po, [PollTypeEnum::PO_TYPE_SELECT, PollTypeEnum::PO_TYPE_RADIO, PollTypeEnum::PO_TYPE_BINARY, PollTypeEnum::PO_TYPE_RATING]);
+    }
+
+    /** [label, target] for each arrow leaving this question; an answer without its own arrow follows "other answers". */
+    public function exitArrows()
+    {
+        $default = $this->poll_next_default ?: 'next';
+
+        if (!$this->branchesPerChoice()) {
+            return [[__('surveys-after-this-question'), $default]];
+        }
+
+        $own = $this->choices->filter(fn($c) => $c->choice_next);
+
+        return $own->map(fn($c) => [$c->choice_content, $c->choice_next])
+            ->when($own->count() < $this->choices->count(), fn($arrows) => $arrows->push([__('surveys-other-answers'), $default]))
+            ->values()->all();
+    }
+
+    /** What an arrow can point to: the following question, any later question, or an end. */
+    public function nextTargetOptions($withOtherAnswers = false)
+    {
+        $polls = $this->survey->getOrderedPolls()->values();
+        $i = $polls->search(fn($p) => $p->id == $this->id);
+        $later = $i === false ? $polls : $polls->slice($i + 1);
+
+        return collect($withOtherAnswers ? ['' => __('surveys-as-other-answers')] : [])
+            ->put('next', __('surveys-next-question'))
+            ->union($later->mapWithKeys(fn($p) => [$p->id => $this->survey->pollNumber($p->id).' · '.\Str::limit(strip_tags($p->body_po), 50)]))
+            ->union(collect(Survey::ENDS)->mapWithKeys(fn($n, $end) => [$end => __('surveys-end-'.$end)]));
+    }
+
+    /** On the walk of this answer; a course's own copy of a question is checked by the app. */
+    public function isOnPath($answer)
+    {
+        return $this->survey->walk($answer)['polls']->contains($this->id);
+    }
+
     public function getTheCondition()
     {
         return $this->relationLoaded('condition') ? $this->condition : $this->memoize('theCondition', fn() => $this->condition()->first());
@@ -223,6 +264,11 @@ class Poll extends ModelBaseForSurveys
         return $this->memoize($key, function () use ($answer, $displayMode) {
             if ($displayMode && ($displayMode != Poll::DISPLAY_MODE_INITIAL)) {
                 return true;
+            }
+
+            // With arrows, a question shows when the answers so far lead to it
+            if ($answer && $this->survey->usesBranching()) {
+                return $this->isOnPath($answer);
             }
 
             if ($answer && ($condition = $this->getTheCondition())) {
@@ -309,6 +355,29 @@ class Poll extends ModelBaseForSurveys
     }
 
 	/* ELEMENTS */
+    /** Under the question in the builder: the answers that lead here, then where each answer goes. */
+    public function getArrowsSummaryEls()
+    {
+        $survey = $this->survey;
+        $from = collect($survey->incomingArrows()[$this->id] ?? []);
+        $isFirst = $survey->getOrderedPolls()->first()?->id == $this->id;
+        $colors = [Survey::END_YES => 'bg-positive bg-opacity-20', Survey::END_NO => 'bg-danger bg-opacity-10 text-danger', Survey::END_WARN => 'bg-warning bg-opacity-20'];
+
+        return _Rows(
+            _Html($isFirst ? __('surveys-first-question') : ($from->isEmpty() ? __('surveys-never-reached')
+                : __('surveys-arrives-from').' '.$from->map(fn($f) => $survey->pollNumber($f[0]->id).' · '.e(\Str::limit(strip_tags($f[1]), 30)))->join(', ')))
+                ->class('text-xs '.(!$isFirst && $from->isEmpty() ? 'text-danger font-medium' : 'text-gray-600')),
+            _Flex(
+                collect($this->exitArrows())->map(function ($arrow) use ($survey, $colors) {
+                    $target = $survey->resolveTarget($this, $arrow[1]);
+
+                    return _Html(e(\Str::limit(strip_tags($arrow[0]), 30)).' → '.$survey->arrowTargetLabel($target))
+                        ->class('text-xs font-medium rounded-lg px-2 py-1 '.($colors[$target] ?? 'bg-gray-100'));
+                })->all()
+            )->class('flex-wrap gap-1'),
+        )->class('gap-1 mt-3');
+    }
+
     public function getDisplayPostConditionEls($answer = null)
     {
         return $this->getPollTypeClass()->getDisplayInputs($this, Poll::DISPLAY_MODE_CONDITION_PASSED, $answer);

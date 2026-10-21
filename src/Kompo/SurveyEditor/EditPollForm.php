@@ -118,6 +118,9 @@ class EditPollForm extends ModalScroll
                 'nullable',
                 'numeric',
             ],
+            'poll_next_default' => 'nullable|max:20',
+            'choices.*.choice_next' => 'nullable|max:20',
+            'choices.*.choice_result_message' => 'nullable|max:500',
             'condition_poll_id' => 'required_unless:has_conditions,0|nullable',
             'condition_type' => 'required_unless:has_conditions,0|nullable',
             'condition_choice_id' => 'required_unless:has_conditions,0|nullable'

@@ -42,6 +42,7 @@ class SurveyFormPage extends Form
                     ),
                     _Html('campaign.options')->class('text-lg font-bold'),
                     new EditSurveyForm($this->model->id),
+                    new SurveyBranchingCard($this->model->id),
                 )->col('col-md-4'),
 
                 _Rows(
