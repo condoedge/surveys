@@ -49,13 +49,17 @@ abstract class BasePollTypeWithChoices extends BasePollType
                 'type_po' => $poll->type_po,
                 'withAmounts' => request('choices_type_temp'),
                 'withQuantities' => request('quantity_type_temp'),
+                'poll_id' => $poll->id,
+                'survey_id' => $poll->survey_id,
+                'poll_section_id' => $poll->poll_section_id,
             ])
-            ->asTable([
+            ->asTable(array_values(array_filter([
                 _Th('campaign.options'),
                 _Th('campaign.amount')->class('choice_amount_input'),
                 _Th('campaign.max-quantity')->class('choice_quantity_input'),
+                $poll->survey?->managesEligibility() && $poll->branchesPerChoice() ? _Th('surveys-then') : null,
                 _Th(''),
-            ])->preloadIfEmpty();
+            ])))->preloadIfEmpty();
 
         if ($poll->hasChoicesAmounts()) {
             $el->class('choices_show_amount');

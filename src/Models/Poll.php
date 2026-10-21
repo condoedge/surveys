@@ -11,6 +11,7 @@ use App\Models\Surveys\AnswerPoll;
 class Poll extends ModelBaseForSurveys
 {
 	use \Condoedge\Surveys\Models\BelongsToSurveyTrait;
+    use HasArrows;
 
     use \Kompo\Database\HasTranslations;
     protected $translatable = [
@@ -225,6 +226,11 @@ class Poll extends ModelBaseForSurveys
                 return true;
             }
 
+            // With arrows, a question shows when the answers so far lead to it
+            if ($answer && $this->survey->managesEligibility()) {
+                return $this->isOnPath($answer);
+            }
+
             if ($answer && ($condition = $this->getTheCondition())) {
                 $ap = AnswerPoll::onlyGetAnswerPoll($answer->id, $condition->condition_poll_id);
                 if ($condition->isFulfilled($ap?->getChoiceIdsAsArray())) {
@@ -297,6 +303,11 @@ class Poll extends ModelBaseForSurveys
 
     protected function setOrUnsetCondition($conditionPollId)
     {
+        // Not sent while the form manages eligibility: the condition stays, ignored, in case it's turned off
+        if (!request()->has('has_conditions')) {
+            return;
+        }
+
         if(request('has_conditions')) {
             $cond = $this->getOrNewTheCondition();
             $cond->condition_poll_id = $conditionPollId;

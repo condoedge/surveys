@@ -8,6 +8,11 @@ use App\Models\Teams\Team;
 
 class Survey extends ModelBaseForSurveys
 {
+	use ManagesEligibility;
+	use \Kompo\Database\HasTranslations;
+
+	protected $translatable = ['end_yes_message', 'end_no_message', 'end_warn_message', 'end_contact'];
+
 	public const SURVEY_ANSWER_PANELID = 'SURVEY_ANSWER_PANELID';
 
 	protected $casts = [

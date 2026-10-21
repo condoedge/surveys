@@ -11,7 +11,7 @@ class PollTypeMultiCheckbox extends BasePollTypeWithChoices
 	/* DISPLAY ELEMENTS */
 	protected function mainInputElWithoutOptions($poll)
     {
-        return _MultiCheckbox()->optionLabelClass('reset-font-size');
+        return _MultiCheckbox()->optionClass('surveyChoiceCard')->optionLabelClass('reset-font-size');
     }
 
 	/* EDIT ELEMENTS */

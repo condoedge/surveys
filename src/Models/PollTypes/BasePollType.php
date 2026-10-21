@@ -6,6 +6,7 @@ use App\Models\Surveys\Condition;
 use App\Models\Surveys\AnswerPoll;
 use App\Models\Surveys\Answer;
 use App\Models\Surveys\Poll;
+use App\Models\Surveys\Survey;
 
 abstract class BasePollType
 {
@@ -30,7 +31,9 @@ abstract class BasePollType
         $mainPoll = $poll->getMainPoll();
 
         $pollPanelId = 'poll-wrapper-'.$poll->id;
-        $isConditionalDisplay = $displayMode == Poll::DISPLAY_MODE_INITIAL && $mainPoll->getTheCondition();
+        $eligibility = $mainPoll->survey?->managesEligibility();
+        // With arrows, the whole path re-renders after each answer: no condition panel waits empty
+        $isConditionalDisplay = !$eligibility && $displayMode == Poll::DISPLAY_MODE_INITIAL && $mainPoll->getTheCondition();
 
         if ($isConditionalDisplay) {
             return _Panel(
@@ -49,7 +52,12 @@ abstract class BasePollType
                 $inputEl = $inputEl->value($ap?->getAnswerTextForFieldValue());
             }
 
-            if (!$multiPage) {
+            if (!$multiPage && $eligibility) {
+                // The path refresh saves the answer and is the confirmation: a toast would cover the button below
+                $inputEl = $inputEl->onChange(
+                    fn($e) => $e->selfPost('refreshSurveyPath', ['poll_id' => $poll->id])->withAllFormValues()->inPanel(Survey::PATH_PANEL)
+                );
+            } elseif (!$multiPage) {
 
                 $defaultTrigger = static::DEFAULT_TRIGGER;
 
@@ -113,7 +121,7 @@ abstract class BasePollType
             $this->getQuestionInfoEls($poll),
             $this->getQuestionOptionsEls($poll),
             $poll->getPollableBox(),
-            $this->getConditionsBox($poll),
+            $poll->survey->managesEligibility() ? $this->getNextDefaultBox($poll) : $this->getConditionsBox($poll),
             $this->getChoicesInfoEls($poll),
         );
     }
@@ -139,6 +147,15 @@ abstract class BasePollType
             _Toggle('campaign.hide-question')->name('hide_poll')->class('mb-2'),
             !$poll->survey->hasAskQuestionOnce() ? null : _Toggle('campaign.ask-question-once')->name('ask_question_once')->class('mb-2'),
         );
+    }
+
+    /** In a survey that manages eligibility, in place of the display condition: where to go after this question. */
+    protected function getNextDefaultBox($poll)
+    {
+        return _Select($poll->branchesPerChoice() ? 'surveys-other-answers' : 'surveys-after-this-question')
+            ->name('poll_next_default')->options($poll->nextTargetOptions())->placeholder('surveys-next-question')
+            ->comment($poll->branchesPerChoice() ? 'surveys-other-answers-hint' : 'surveys-after-this-question-hint')
+            ->class('mb-4');
     }
 
     protected function getConditionsBox($poll)

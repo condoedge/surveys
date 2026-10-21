@@ -118,9 +118,13 @@ class EditPollForm extends ModalScroll
                 'nullable',
                 'numeric',
             ],
-            'condition_poll_id' => 'required_unless:has_conditions,0|nullable',
-            'condition_type' => 'required_unless:has_conditions,0|nullable',
-            'condition_choice_id' => 'required_unless:has_conditions,0|nullable'
+            'poll_next_default' => 'nullable|max:20',
+            'choices.*.choice_next' => 'nullable|max:20',
+            'choices.*.choice_result_message' => 'nullable|max:500',
+            // has_conditions isn't sent when the form uses arrows: the condition box is replaced
+            'condition_poll_id' => 'required_if:has_conditions,1|nullable',
+            'condition_type' => 'required_if:has_conditions,1|nullable',
+            'condition_choice_id' => 'required_if:has_conditions,1|nullable'
     	];
     }
 }
