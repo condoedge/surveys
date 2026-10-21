@@ -226,8 +226,8 @@ class Survey extends ModelBaseForSurveys
 		return _Rows(
 			_Html(__('surveys-result-'.$end))->class('font-semibold'),
 			_Html(e($this->endMessage($end, $ownMessage))),
-			$end != static::END_WARN || !$this->end_contact ? null : _Html(e($this->end_contact))->class('font-medium break-words'),
-		)->class('rounded-2xl p-4 gap-1 my-4 break-words '.$colors[$end]);
+			$end != static::END_WARN || !$this->end_contact ? null : _Html(e($this->end_contact))->class('font-medium'),
+		)->class('rounded-2xl p-4 gap-1 my-4 '.$colors[$end])->style('overflow-wrap: anywhere');
 	}
 
 	/** What the arrows leave broken: a question no answer leads to, or no way to reach "eligible". */

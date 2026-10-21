@@ -55,7 +55,7 @@ class SurveyBranchingCard extends Form
             'end_yes_message' => 'nullable|max:1000',
             'end_no_message' => 'nullable|max:1000',
             'end_warn_message' => 'nullable|max:1000',
-            'end_contact' => 'nullable|max:255',
+            'end_contact' => 'nullable',
         ];
     }
 }
