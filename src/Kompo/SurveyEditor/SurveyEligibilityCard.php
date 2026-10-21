@@ -36,9 +36,9 @@ class SurveyEligibilityCard extends Form
                     ->selfGet('getPlanEls')->inModal(),
             ),
             _Html('surveys-form-ends-hint')->class('text-sm text-gray-600 mb-2'),
-            _Rows(...collect(Survey::ENDS)->keys()->map(fn($end) => _Textarea(__('surveys-result-'.$end))
-                ->name('end_'.$end.'_message')->placeholder(__('surveys-end-'.$end.'-default'))->rows(2))->all()),
-            _Input('surveys-end-contact')->name('end_contact')->placeholder('surveys-end-contact-placeholder'),
+            _Rows(...collect(Survey::ENDS)->keys()->map(fn($end) => _Translatable(__('surveys-result-'.$end))
+                ->name('end_'.$end.'_message')->placeholder(__('surveys-end-'.$end.'-default'))->asTextarea())->all()),
+            _Translatable('surveys-end-contact')->name('end_contact')->placeholder('surveys-end-contact-placeholder'),
             _SubmitButton('campaign.save')->alert('surveys-ends-saved')->class('w-full md:w-auto'),
             _Html('surveys-checks')->class('font-semibold mt-4'),
             !$issues ? _Html('surveys-checks-ok')->class('text-sm text-positive')
@@ -60,7 +60,7 @@ class SurveyEligibilityCard extends Form
             'end_yes_message' => 'nullable|max:1000',
             'end_no_message' => 'nullable|max:1000',
             'end_warn_message' => 'nullable|max:1000',
-            'end_contact' => 'nullable|max:255',
+            'end_contact' => 'nullable',
         ];
     }
 }

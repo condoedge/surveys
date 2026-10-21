@@ -24,7 +24,7 @@ return new class extends Migration
             $table->text('end_yes_message')->nullable();
             $table->text('end_no_message')->nullable();
             $table->text('end_warn_message')->nullable();
-            $table->string('end_contact')->nullable();
+            $table->text('end_contact')->nullable(); // both languages, as JSON
         });
 
         Schema::table('answers', function (Blueprint $table) {
