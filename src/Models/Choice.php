@@ -6,6 +6,9 @@ class Choice extends ModelBaseForSurveys
 {
 	use \Condoedge\Surveys\Models\BelongsToPollTrait;
 
+	use \Kompo\Database\HasTranslations;
+	protected $translatable = ['choice_result_message'];
+
 	/* RELATIONS */
 
 	/* SCOPES */

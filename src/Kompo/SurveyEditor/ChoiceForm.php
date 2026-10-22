@@ -37,7 +37,7 @@ class ChoiceForm extends Form
             _Input()->name('choice_max_quantity')->class('mb-0')->tdClass('choice_quantity_input'),
             ...(!$this->targets ? [] : [_Rows(
                 _Select()->name('choice_next')->options($this->targets)->placeholder('surveys-as-other-answers')->class('mb-0')->style('min-width: 11rem; max-width: 15rem'),
-                _Input()->name('choice_result_message')->placeholder('surveys-result-message-placeholder')->class('mb-0'),
+                _Translatable()->name('choice_result_message')->placeholder('surveys-result-message-placeholder')->class('mb-0 mt-8'),
             )->class('gap-1')]),
             $this->canDelete ? $this->deleteLinkChoice() : _Html(),
     	];

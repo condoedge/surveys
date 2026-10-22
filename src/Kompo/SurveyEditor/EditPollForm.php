@@ -62,7 +62,8 @@ class EditPollForm extends ModalScroll
 
     public function headerButtons()
     {
-        return _SubmitButton('campaign.save');
+        // Keeps the button clear of the modal's fixed close icon on phones
+        return _Div(_SubmitButton('campaign.save'))->class('pr-12 md:pr-0');
     }
 
     public function body()

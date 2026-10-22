@@ -179,7 +179,7 @@ trait ManagesEligibility
 		return $issues;
 	}
 
-	/** Every path at a glance: questions in columns by how deep they sit, each with where its answers go, the ends last. */
+	/** Every path at a glance: questions in columns by how deep they sit, each with where its answers go, the ends below. */
 	public function planEls()
 	{
 		$polls = $this->getOrderedPolls()->values();
@@ -196,11 +196,11 @@ trait ManagesEligibility
 
 		$columns = $polls->groupBy(fn($poll) => $depth[$poll->id] ?? 0)->sortKeys();
 
-		$ends = _Rows(
+		$ends = _Flex(
 			...collect(static::ENDS)->keys()->map(fn($end) => $this->endCardEls($end)->class('w-52 !my-0'))->all(),
-		)->class('gap-3');
+		)->class('gap-3 flex-wrap');
 
-		return _Flex(
+		return _Rows(_Flex(
 			...$columns->map(fn($column) => _Rows(
 				...$column->map(fn($poll) => _Rows(
 					_Html($this->pollNumber($poll->id))->class('font-bold text-level3'),
@@ -208,8 +208,8 @@ trait ManagesEligibility
 					...collect($poll->exitArrows())->map(fn($arrow) => _Html(e(\Str::limit(strip_tags($arrow[0]), 24)).' → '
 						.$this->arrowTargetLabel($this->resolveTarget($poll, $arrow[1])))->class('text-xs text-gray-600'))->all(),
 				)->class('bg-white border border-gray-200 rounded-xl p-3 w-52'))->all(),
-			)->class('gap-3'))->values()->push($ends)->all(),
-		)->class('gap-6 items-start');
+			)->class('gap-3'))->values()->all(),
+		)->class('gap-6 items-start flex-wrap'), $ends)->class('gap-6');
 	}
 
 	/** "→ Q8", "→ Admissible": where an arrow lands, for the builder. */
