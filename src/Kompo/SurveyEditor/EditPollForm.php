@@ -12,7 +12,7 @@ class EditPollForm extends ModalScroll
 {
 	public $model = Poll::class;
 
-    public $class = 'card-white max-w-2xl overflow-y-auto mini-scroll';
+    public $class = 'card-white max-w-5xl overflow-y-auto mini-scroll';
     public $style = 'height: 95vh; width: 95vw;';
 	
     public $_Title = 'campaign.add-new-poll';
