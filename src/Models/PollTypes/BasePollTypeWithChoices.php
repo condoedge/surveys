@@ -37,8 +37,9 @@ abstract class BasePollTypeWithChoices extends BasePollType
                 ->name('quantity_type_temp', false)
                 ->value($poll->hasChoicesQuantities())
                 ->run('() => { $("#choices-multi-form").toggleClass("choices_show_quantity") }'),
-            $this->getChoicesMultiForm($poll),
-        )->class('bg-info bg-opacity-10 p-6 mt-6');
+            // On a phone the table scrolls inside its box instead of pushing the window sideways
+            _Div($this->getChoicesMultiForm($poll))->class('overflow-x-auto'),
+        )->class('bg-info bg-opacity-10 p-3 md:p-6 mt-6');
     }
 
     protected function getChoicesMultiForm($poll)
