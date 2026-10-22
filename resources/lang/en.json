@@ -31,6 +31,7 @@
 	"surveys-end-contact-placeholder": "Email or phone",
 	"surveys-ends-saved": "Form ends saved",
 	"surveys-checks": "Checks",
+	"surveys-checks-no-question": "Add a first question to see what the arrows leave out.",
 	"surveys-checks-ok": "Every question can be reached.",
 	"surveys-check-never-asked": ":q is never asked: no answer leads to it.",
 	"surveys-check-no-yes": "Nobody can reach \"Eligible\": no answer leads to it.",

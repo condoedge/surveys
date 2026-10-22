@@ -41,8 +41,9 @@ class SurveyEligibilityCard extends Form
             _Translatable('surveys-end-contact')->name('end_contact')->placeholder('surveys-end-contact-placeholder'),
             _SubmitButton('campaign.save')->alert('surveys-ends-saved')->class('w-full md:w-auto'),
             _Html('surveys-checks')->class('font-semibold mt-4'),
-            !$issues ? _Html('surveys-checks-ok')->class('text-sm text-positive')
-                : _Rows(collect($issues)->map(fn($issue) => _Html(e($issue))->class('text-sm text-danger'))->all())->class('gap-1'),
+            $this->model->getOrderedPolls()->isEmpty() ? _Html('surveys-checks-no-question')->class('text-sm text-gray-600') :
+            (!$issues ? _Html('surveys-checks-ok')->class('text-sm text-positive')
+                : _Rows(collect($issues)->map(fn($issue) => _Html(e($issue))->class('text-sm text-danger'))->all())->class('gap-1')),
         )->class('gap-2');
     }
 

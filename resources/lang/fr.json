@@ -31,6 +31,7 @@
 	"surveys-end-contact-placeholder": "Courriel ou téléphone",
 	"surveys-ends-saved": "Fins du formulaire enregistrées",
 	"surveys-checks": "Vérifications",
+	"surveys-checks-no-question": "Ajoutez une première question pour voir ce que les flèches laissent de côté.",
 	"surveys-checks-ok": "Toutes les questions sont atteintes.",
 	"surveys-check-never-asked": ":q n'est jamais posée : aucune réponse n'y mène.",
 	"surveys-check-no-yes": "Personne ne peut atteindre « Admissible » : aucune réponse n'y mène.",
