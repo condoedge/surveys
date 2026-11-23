@@ -49,7 +49,7 @@ abstract class BasePollType
 
             if ($answer) {//Set value
                 $ap = AnswerPoll::onlyGetAnswerPoll($answer->id, $poll->id);
-                $inputEl = $inputEl->value($ap?->getAnswerTextForFieldValue());
+                $inputEl = $inputEl->value($this->fieldValue($ap));
             }
 
             if (!$multiPage && $eligibility) {
@@ -97,6 +97,11 @@ abstract class BasePollType
     protected function mainInputEl($poll)
     {
         //OVERRIDE
+    }
+
+    protected function fieldValue($answerPoll)
+    {
+        return $answerPoll?->getAnswerTextForFieldValue();
     }
 
     protected function titleExplanationEls($poll)
@@ -223,6 +228,12 @@ abstract class BasePollType
     }
 
     public static function transformAnswer($poll, $value)
+    {
+        return $value;
+    }
+
+    /** What the answer keeps once the value is valid. */
+    public function answerTextToSave($answerPoll, $value)
     {
         return $value;
     }

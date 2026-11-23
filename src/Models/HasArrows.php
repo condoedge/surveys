@@ -66,7 +66,7 @@ trait HasArrows
         return $i === false ? collect() : $polls->filter(fn($p) => $sectionIds->search($p->poll_section_id) > $i);
     }
 
-    /** On the walk of this answer; a course's own copy of a question is checked by the app. */
+    /** On the walk of this answer; a linked product's own copy of a question is checked by the app. */
     public function isOnPath($answer)
     {
         return $this->survey->walk($answer)['polls']->contains($this->id);

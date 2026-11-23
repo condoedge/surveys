@@ -7,6 +7,8 @@ use App\Models\Surveys\Poll as AppPoll;
 use App\Models\Surveys\Condition;
 use App\Models\Surveys\PollSection;
 use App\Models\Surveys\AnswerPoll;
+use Condoedge\Surveys\Models\PollTypes\PollTypeFile;
+use Illuminate\Support\Facades\URL;
 
 class Poll extends ModelBaseForSurveys
 {
@@ -19,6 +21,7 @@ class Poll extends ModelBaseForSurveys
     ];
     protected $casts = [
         'type_po' => PollTypeEnum::class,
+        'file_kinds' => 'array',
     ];
 
     public const CHOICES_TEXT = 1;
@@ -257,7 +260,7 @@ class Poll extends ModelBaseForSurveys
         $this->getTheCondition()?->delete();
         $this->getDependentConditions()->each->delete();
         $this->choices->each->delete();
-        $this->answerPolls()->delete();
+        $this->answerPolls()->get()->each->delete();
 
         parent::delete();
     }
@@ -343,6 +346,18 @@ class Poll extends ModelBaseForSurveys
     public function getPollableBox()
     {
         //OVERRIDE
+    }
+
+    /** A Document question's files, all in one ZIP. */
+    public function getAnswerFilesZipLink()
+    {
+        if (!$this->getPollTypeClass() instanceof PollTypeFile) {
+            return null;
+        }
+
+        return _Link('surveys-file-download-all')->outlined()->href(
+            URL::temporarySignedRoute('surveys.poll-files', now()->addMinutes(AnswerPoll::FILE_LINK_MINUTES), ['poll' => $this->id])
+        );
     }
 
     public function checkUrlsInTextEl($text)

@@ -6,6 +6,7 @@ use App\Models\Surveys\Poll;
 use App\Models\Surveys\Choice;
 use App\Models\Surveys\Condition;
 use Condoedge\Surveys\Kompo\Common\ModalScroll;
+use Condoedge\Surveys\Models\PollTypes\PollTypeFile;
 use Illuminate\Validation\Rule;
 
 class EditPollForm extends ModalScroll
@@ -119,6 +120,8 @@ class EditPollForm extends ModalScroll
                 'nullable',
                 'numeric',
             ],
+            // Said as the field's own hint, not with the column's name
+            'max_file_mb' => ['nullable', 'integer', fn ($attribute, $value, $fail) => $value >= 1 && $value <= PollTypeFile::MAX_MB ?: $fail(__('surveys-file-max-mb-hint', ['max' => PollTypeFile::MAX_MB]))],
             'poll_next_default' => 'nullable|max:20',
             'choices.*.choice_next' => 'nullable|max:20',
             'choices.*.choice_result_message' => 'nullable|max:500',

@@ -40,7 +40,7 @@ trait ManagesEligibility
 
 	/**
 	 * The questions a person goes through, following each answer's arrow, and the end reached (null while unanswered).
-	 * $concrete gives the poll actually answered for a question (a course's own copy), or null to skip it.
+	 * $concrete gives the poll actually answered for a question (a linked product's own copy), or null to skip it.
 	 */
 	public function walk($answer, ?callable $concrete = null, string $cacheKey = 'main')
 	{

@@ -39,6 +39,12 @@ class Answer extends ModelBaseForSurveys
         });
     }
 
+    /** Names the files this answer sent, in a question's ZIP. */
+    public function getAnswererName()
+    {
+        return __('surveys-answer').' '.$this->id;
+    }
+
     public static function answerPayloadColumns()
     {
         return [
@@ -77,7 +83,7 @@ class Answer extends ModelBaseForSurveys
         $poll->validateAnswer($pollAnswer, $this);
 
         $ap = AnswerPoll::createOrGetAnswerPoll($this->id, $pollId);
-        $ap->answer_text = $pollAnswer;
+        $ap->answer_text = $poll->getPollTypeClass()->answerTextToSave($ap, $pollAnswer);
         $ap->save();
 
         return $ap;
@@ -85,7 +91,7 @@ class Answer extends ModelBaseForSurveys
 
     public function delete()
     {
-        $this->answerPolls()->delete();
+        $this->answerPolls()->get()->each->delete();
 
         parent::delete();
     }

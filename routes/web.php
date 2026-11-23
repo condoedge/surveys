@@ -8,3 +8,8 @@ Route::layout('layouts.dashboard')->middleware(['auth'])->group(function(){
 
 });
 
+// Links expire: the signature is checked first, then the app's Gate decides who may open the files
+Route::middleware(['auth', 'signed'])->group(function () {
+    Route::get('survey-answer-files/{answerPoll}', [Condoedge\Surveys\Http\Controllers\AnswerFileController::class, 'show'])->name('surveys.answer-file');
+    Route::get('survey-poll-files/{poll}', [Condoedge\Surveys\Http\Controllers\AnswerFileController::class, 'zip'])->name('surveys.poll-files');
+});
