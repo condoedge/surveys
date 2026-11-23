@@ -18,7 +18,7 @@ class AnswerFileController
 
         $file = $answerPoll->getAnswerFile() ?? abort(404);
 
-        return Storage::disk($file['disk'])->response($file['path'], $file['name']);
+        return Storage::disk($file['disk'])->{request('download') ? 'download' : 'response'}($file['path'], $file['name']);
     }
 
     /** Every file sent to the question, each named after the person who sent it. */

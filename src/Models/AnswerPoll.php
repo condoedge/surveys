@@ -91,9 +91,9 @@ class AnswerPoll extends ModelBaseForSurveys
 	}
 
 	/** A short-lived link: the route checks the signature, then who is asking. */
-	public function getAnswerFileUrl()
+	public function getAnswerFileUrl(bool $download = false)
 	{
-		return URL::temporarySignedRoute('surveys.answer-file', now()->addMinutes(static::FILE_LINK_MINUTES), ['answerPoll' => $this->id]);
+		return URL::temporarySignedRoute('surveys.answer-file', now()->addMinutes(static::FILE_LINK_MINUTES), ['answerPoll' => $this->id] + ($download ? ['download' => 1] : []));
 	}
 
 
@@ -134,11 +134,11 @@ class AnswerPoll extends ModelBaseForSurveys
     }
 
 	/* ELEMENTS */
-	/** For the organization's answer screens: a file opens through its link, any other answer is its text. */
+	/** For the organization's answer screens: a file opens in a preview window, any other answer is its text. */
 	public function getAnswerDescriptionEl()
 	{
 		return $this->getAnswerFile() ?
-			_Link($this->getAnswerFile()['name'])->href($this->getAnswerFileUrl())->inNewTab()->class('underline') :
+			_Link($this->getAnswerFile()['name'])->get('surveys.answer-file-preview', ['answer_poll_id' => $this->id])->inModal()->class('underline') :
 			_Html($this->getAnswerDescriptionText());
 	}
 }
