@@ -3,6 +3,7 @@
 namespace Condoedge\Surveys\Models\PollTypes;
 
 use App\Models\Surveys\Condition;
+use App\Models\Surveys\Choice;
 use App\Models\Surveys\AnswerPoll;
 use App\Models\Surveys\Answer;
 use App\Models\Surveys\Poll;
@@ -189,7 +190,8 @@ abstract class BasePollType
                 _Select('campaign.answer-for-the-condition')
                     ->name('condition_choice_id', false)
                     ->optionsFromField('condition_poll_id', 'searchConditionPollChoices', 'retrieveConditionPollChoice')
-                    ->value($condition?->condition_choice_id)
+                    // The answer may have been deleted since the condition was set: the field then opens empty.
+                    ->value(Choice::find($condition?->condition_choice_id)?->id)
                     ->class('whiteField mb-2')
             )->class('bg-gray-200 py-4 px-6 !mb-2')
             ->id('condition-inputs')
