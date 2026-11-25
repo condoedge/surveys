@@ -45,10 +45,12 @@
 	"surveys-file-kind-office": "Word ou Excel",
 	"surveys-file-max-mb": "Taille maximale (Mo)",
 	"surveys-file-max-mb-hint": "Jusqu'à :max Mo. Un seul fichier par réponse.",
+	"surveys-file-max-mb-error": "La taille maximale est de :max Mo.",
 	"surveys-file-photo-or-file": "Prendre une photo ou choisir un fichier",
 	"surveys-file-choose": "Choisir un fichier",
 	"surveys-file-hint": ":kinds · :mb Mo max",
 	"surveys-file-private": "Votre fichier n'est visible que par l'organisme.",
+	"surveys-file-size-units": "o Ko Mo",
 	"surveys-file-too-big": "Ce fichier est trop lourd : la limite est de :mb Mo.",
 	"surveys-file-wrong-kind": "Ce type de fichier n'est pas accepté. Fichiers acceptés : :kinds.",
 	"surveys-file-download-all": "Télécharger tous les fichiers (ZIP)"

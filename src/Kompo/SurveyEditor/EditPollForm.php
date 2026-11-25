@@ -120,8 +120,8 @@ class EditPollForm extends ModalScroll
                 'nullable',
                 'numeric',
             ],
-            // Said as the field's own hint, not with the column's name
-            'max_file_mb' => ['nullable', 'integer', fn ($attribute, $value, $fail) => $value >= 1 && $value <= PollTypeFile::MAX_MB ?: $fail(__('surveys-file-max-mb-hint', ['max' => PollTypeFile::MAX_MB]))],
+            // Said in words, not with the column's name
+            'max_file_mb' => ['nullable', 'integer', fn ($attribute, $value, $fail) => $value >= 1 && $value <= PollTypeFile::MAX_MB ?: $fail(__('surveys-file-max-mb-error', ['max' => PollTypeFile::MAX_MB]))],
             'poll_next_default' => 'nullable|max:20',
             'choices.*.choice_next' => 'nullable|max:20',
             'choices.*.choice_result_message' => 'nullable|max:500',
