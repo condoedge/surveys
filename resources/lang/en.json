@@ -45,10 +45,12 @@
 	"surveys-file-kind-office": "Word or Excel",
 	"surveys-file-max-mb": "Maximum size (MB)",
 	"surveys-file-max-mb-hint": "Up to :max MB. One file per answer.",
+	"surveys-file-max-mb-error": "The maximum size is :max MB.",
 	"surveys-file-photo-or-file": "Take a photo or choose a file",
 	"surveys-file-choose": "Choose a file",
 	"surveys-file-hint": ":kinds · :mb MB max",
 	"surveys-file-private": "Your file is only visible to the organization.",
+	"surveys-file-size-units": "B KB MB",
 	"surveys-file-too-big": "This file is too big: the limit is :mb MB.",
 	"surveys-file-wrong-kind": "This kind of file is not accepted. Accepted files: :kinds.",
 	"surveys-file-download-all": "Download all files (ZIP)"
