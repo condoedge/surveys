@@ -4,25 +4,27 @@ namespace Condoedge\Surveys\Kompo\SurveyAnswers;
 
 use App\Models\Surveys\Answer;
 use App\Models\Surveys\Condition;
+use App\Models\Surveys\Poll;
+use Illuminate\Validation\ValidationException;
 
 trait HandlesInlinePollSaving
 {
     public function saveInlinePollAnswer()
     {
-        $pollId = request('poll_id');
+        $poll = Poll::findOrFail(request('poll_id'));
 
-        $this->model->saveAnswerToSinglePoll($pollId);
-
-        return $this->model->getTotalAnswerCostEls();
+        return $this->savedOrRefused(fn () => $poll->getPollTypeClass()->saveInline($poll, $this->model));
     }
 
     /** A form with arrows: save the answer, then show the path it now leads to. */
     public function refreshSurveyPath()
     {
-        $this->model->saveAnswerToSinglePoll(request('poll_id'));
-        \App\Models\Surveys\Survey::forgetAnswerReads();
+        return $this->savedOrRefused(function () {
+            $this->model->saveAnswerToSinglePoll(request('poll_id'));
+            \App\Models\Surveys\Survey::forgetAnswerReads();
 
-        return $this->pathEls();
+            return $this->pathEls();
+        });
     }
 
     public function manageDisplayForCondition()
@@ -36,5 +38,17 @@ trait HandlesInlinePollSaving
         }
 
         return null;
+    }
+
+    /** A refused answer is said in an alert, not as an error: Kompo leaves « Continue » spinning after a failed request. */
+    protected function savedOrRefused(callable $save)
+    {
+        $this->model->savingInline = true;
+
+        try {
+            return $save();
+        } catch (ValidationException $e) {
+            return response()->kompoAlert('', options: ['alertClass' => 'vlAlertError', 'message' => collect($e->errors())->flatten()->first()]);
+        }
     }
 }
