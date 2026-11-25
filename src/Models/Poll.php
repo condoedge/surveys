@@ -62,6 +62,14 @@ class Poll extends ModelBaseForSurveys
         return $this->hasMany(AnswerPoll::class);
     }
 
+    /** A Document question's submitted files, its copies per product included. */
+    public function submittedFileAnswerPolls()
+    {
+        return AnswerPoll::whereIn('poll_id', $this->subPolls()->pluck('id')->push($this->id))
+            ->whereNotNull('answer_text')
+            ->whereHas('answer', fn ($q) => $q->lockedAnswer());
+    }
+
     public function pollable()
     {
         return $this->morphTo();
@@ -347,10 +355,10 @@ class Poll extends ModelBaseForSurveys
         //OVERRIDE
     }
 
-    /** A Document question's files, all in one ZIP. */
+    /** A Document question's files, all in one ZIP, once one was sent. */
     public function getAnswerFilesZipLink()
     {
-        if (!$this->getPollTypeClass() instanceof PollTypeFile) {
+        if (!$this->getPollTypeClass() instanceof PollTypeFile || !$this->submittedFileAnswerPolls()->exists()) {
             return null;
         }
 
