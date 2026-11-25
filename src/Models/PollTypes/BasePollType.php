@@ -42,7 +42,15 @@ abstract class BasePollType
             )->id($pollPanelId);
         }
 
-        $inputEl = $this->mainInputEl($mainPoll);
+        return _Panel(
+            $this->questionEls($poll, $displayMode, $answer, $multiPage)
+        )->id($pollPanelId);
+    }
+
+    /** The question's title and its field, which saves the answer as soon as it is given. */
+    protected function questionEls($poll, $displayMode, $answer = null, $multiPage = false)
+    {
+        $inputEl = $this->mainInputEl($poll->getMainPoll());
 
         if (static::POLL_IS_A_FIELD && ($displayMode != Poll::DISPLAY_MODE_EDITING)) {
             $inputEl = $inputEl->name($poll->getPollInputName(), false)
@@ -53,46 +61,44 @@ abstract class BasePollType
                 $inputEl = $inputEl->value($this->fieldValue($ap));
             }
 
-            if (!$multiPage && $eligibility) {
-                // The path refresh saves the answer and is the confirmation: a toast would cover the button below
-                $inputEl = $inputEl->onChange(
-                    fn($e) => $e->selfPost('refreshSurveyPath', ['poll_id' => $poll->id])->withAllFormValues()->inPanel(Survey::PATH_PANEL)
-                );
-            } elseif (!$multiPage) {
-
-                $defaultTrigger = static::DEFAULT_TRIGGER;
-
-                $inputEl = $inputEl->{$defaultTrigger}(
-                    fn($e) => $e->selfPost('saveInlinePollAnswer', [
-                        'poll_id' => $poll->id,
-                    ])->withAllFormValues()->inPanel(Answer::SURVEY_COST_PANEL),
-                );
-
-                foreach ($poll->getDependentConditions() as $condition) {
-                    $inputEl = $inputEl->onChange(
-                        fn($e) => $e->selfPost('manageDisplayForCondition', [
-                            'condition_id' => $condition->id,
-                        ])->inPanel('poll-wrapper-'.$condition->poll_id)
-                    );
-                }
-
-                //Last optional Action
-                $inputEl = $inputEl->alert('survey.answer-saved');
+            if (!$multiPage) {
+                $inputEl = $this->savesWhenAnswered($inputEl, $poll);
             }
         }
 
-        $els = _Rows(
+        return _Rows(
             $this->titleExplanationEls($poll),
             $inputEl,
         );
+    }
 
-        if ($isConditionalDisplay) {
-            return $els;
+    protected function savesWhenAnswered($inputEl, $poll)
+    {
+        if ($poll->getMainPoll()->survey?->managesEligibility()) {
+            // The path refresh saves the answer and is the confirmation: a toast would cover the button below
+            return $inputEl->onChange(
+                fn($e) => $e->selfPost('refreshSurveyPath', ['poll_id' => $poll->id])->withAllFormValues()->inPanel(Survey::PATH_PANEL)
+            );
         }
 
-        return _Panel(
-           $els
-        )->id($pollPanelId);
+        $defaultTrigger = static::DEFAULT_TRIGGER;
+
+        $inputEl = $inputEl->{$defaultTrigger}(
+            fn($e) => $e->selfPost('saveInlinePollAnswer', [
+                'poll_id' => $poll->id,
+            ])->withAllFormValues()->inPanel(Answer::SURVEY_COST_PANEL),
+        );
+
+        foreach ($poll->getDependentConditions() as $condition) {
+            $inputEl = $inputEl->onChange(
+                fn($e) => $e->selfPost('manageDisplayForCondition', [
+                    'condition_id' => $condition->id,
+                ])->inPanel('poll-wrapper-'.$condition->poll_id)
+            );
+        }
+
+        //Last optional Action
+        return $inputEl->alert('survey.answer-saved');
     }
 
     protected function mainInputEl($poll)
@@ -204,6 +210,14 @@ abstract class BasePollType
     }
 
     /* ACTIONS */
+    /** Saved as soon as the person answers, from the question's field. */
+    public function saveInline($poll, $answer)
+    {
+        $answer->saveAnswerToSinglePoll($poll->id);
+
+        return $answer->getTotalAnswerCostEls();
+    }
+
     public function validatePollAnswer($poll, $value, $answer)
     {
         if (!static::POLL_IS_A_FIELD) {

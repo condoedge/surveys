@@ -11,6 +11,9 @@ class Answer extends ModelBaseForSurveys
 
     public const SURVEY_COST_PANEL = 'survey-cost-panel';
 
+    /** Saved as the person answers, question by question, not by « Continue ». */
+    public bool $savingInline = false;
+
 	/* RELATIONS */
     public function answerPolls()
     {
