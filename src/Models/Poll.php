@@ -8,7 +8,6 @@ use App\Models\Surveys\Condition;
 use App\Models\Surveys\PollSection;
 use App\Models\Surveys\AnswerPoll;
 use Condoedge\Surveys\Models\PollTypes\PollTypeFile;
-use Illuminate\Support\Facades\URL;
 
 class Poll extends ModelBaseForSurveys
 {
@@ -355,9 +354,7 @@ class Poll extends ModelBaseForSurveys
             return null;
         }
 
-        return _Link('surveys-file-download-all')->outlined()->href(
-            URL::temporarySignedRoute('surveys.poll-files', now()->addMinutes(AnswerPoll::FILE_LINK_MINUTES), ['poll' => $this->id])
-        );
+        return _Link('surveys-file-download-all')->outlined()->href(route('surveys.poll-files', ['poll' => $this->id]));
     }
 
     public function checkUrlsInTextEl($text)
