@@ -26,9 +26,7 @@ class AnswerFileController
     {
         Gate::authorize(PollTypeFile::VIEW_FILES_ABILITY, $poll);
 
-        $answerPolls = AnswerPoll::whereIn('poll_id', $poll->subPolls()->pluck('id')->push($poll->id))
-            ->whereHas('answer', fn ($q) => $q->lockedAnswer())
-            ->with('answer', 'poll')->get();
+        $answerPolls = $poll->submittedFileAnswerPolls()->with('answer', 'poll')->get();
 
         $zipPath = tempnam(sys_get_temp_dir(), 'survey-files');
         $zip = new \ZipArchive();
@@ -43,7 +41,10 @@ class AnswerFileController
             }
         }
 
+        // An archive without a file is never written: nothing to download
+        $hasFiles = $zip->numFiles > 0;
         $zip->close();
+        abort_unless($hasFiles, 404);
 
         return response()->download($zipPath, Str::slug(strip_tags($poll->body_po)).'.zip')->deleteFileAfterSend();
     }
