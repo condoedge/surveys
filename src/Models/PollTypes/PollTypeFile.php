@@ -43,7 +43,9 @@ class PollTypeFile extends BasePollType
             ->attr(['accept' => $kinds->flatMap->extensions()->map(fn ($extension) => '.'.$extension)->implode(',')])
             ->comment(($this->refusal ? '<div class="vlFieldErrors !text-base -ml-1">'.e($this->refusal).'</div>' : '')
                 .__('surveys-file-hint', ['kinds' => static::kindsLabel($poll), 'mb' => static::maxMb($poll)]).'<br>'.__('surveys-file-private'))
-            ->class($this->refusal ? 'vlHasErrors' : '');
+            ->class($this->refusal ? 'vlHasErrors' : '')
+            // The × that removes the file is a 44 px touch target, the field keeps its height
+            ->class('[&_div.vlSingle]:py-[3px] [&_div.vlSingle]:pl-0 [&_.vlCustomLabel]:min-h-11 [&_.icon-times]:self-stretch [&_.icon-times]:flex [&_.icon-times]:items-center [&_.icon-times]:px-3');
     }
 
     /** Sent alone, never with the form's other files, and answered by the question shown again (saveInline). */
@@ -62,7 +64,7 @@ class PollTypeFile extends BasePollType
     {
         $file = $answerPoll?->getAnswerFile();
 
-        return $file ? ['name' => $file['name'].' · '.Number::fileSize($file['size'], maxPrecision: 1)] + $file : null;
+        return $file ? ['name' => $file['name'].' · '.static::sizeLabel($file['size'])] + $file : null;
     }
 
 	/* EDIT ELEMENTS */
@@ -172,5 +174,17 @@ class PollTypeFile extends BasePollType
     protected static function kindsLabel($poll)
     {
         return static::kinds($poll)->map->label()->implode(', ');
+    }
+
+    /** In the page's language: 604 o and 4,3 Ko in French. */
+    protected static function sizeLabel($bytes)
+    {
+        $units = explode(' ', __('surveys-file-size-units'));
+
+        for ($i = 0; $bytes / 1024 > 0.9 && $i < count($units) - 1; $i++) {
+            $bytes /= 1024;
+        }
+
+        return Number::format($bytes, maxPrecision: 1, locale: app()->getLocale()).' '.$units[$i];
     }
 }
