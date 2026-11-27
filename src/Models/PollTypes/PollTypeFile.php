@@ -159,9 +159,10 @@ class PollTypeFile extends BasePollType
         return $fileHandler;
     }
 
+    /** The question's limit, or the server's upload limit when it is lower, since PHP drops a bigger file first. */
     protected static function maxMb($poll)
     {
-        return min($poll->max_file_mb ?: static::DEFAULT_MAX_MB, static::MAX_MB);
+        return min($poll->max_file_mb ?: static::DEFAULT_MAX_MB, static::MAX_MB, intdiv(UploadedFile::getMaxFilesize(), 1024 * 1024));
     }
 
     /** None chosen accepts every kind. */
