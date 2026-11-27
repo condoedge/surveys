@@ -59,12 +59,15 @@ class PollTypeFile extends BasePollType
         return $inputEl->onChange(fn ($e) => $e->selfPost('saveInlinePollAnswer', ['poll_id' => $poll->id]));
     }
 
-    /** The file already sent, named with its size. */
+    /** The file already sent, named with its size: a long name is cut, never the size. */
     protected function fieldValue($answerPoll)
     {
         $file = $answerPoll?->getAnswerFile();
 
-        return $file ? ['name' => $file['name'].' · '.static::sizeLabel($file['size'])] + $file : null;
+        return $file ? ['name' => _Flex(
+            _Html(e($file['name']))->class('truncate'),
+            _Html('· '.static::sizeLabel($file['size']))->class('shrink-0'),
+        )->class('min-w-0 gap-1')] + $file : null;
     }
 
 	/* EDIT ELEMENTS */
